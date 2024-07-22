@@ -18,5 +18,7 @@ thiserror.workspace = true
 
 [features]
 default = []
-hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"]
+hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"{% if
+style == "Thaw" %}, ["thaw/hydrate"]{% endif %}]
+ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"{%
+if style == "Thaw" %}, ["thaw/ssr"]{% endif %}]
