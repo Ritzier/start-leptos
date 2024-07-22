@@ -37,8 +37,8 @@ bin-package = "server"
 lib-package = "frontend"
 
 site-root = "target/site"
-site-pkg-dir = "pkg"
 {% if style == "Default" %}
+site-pkg-dir = "pkg"
 style-file = "style/main.scss"
 {% endif %}
 {% if style == "TailwindCSS" %}
@@ -46,7 +46,7 @@ style-file = "style/output.css"
 tailwind-input-file = "style/output.css"
 {% endif %}
 {% if style == "Thaw" %}
-style-file = "thaw"
+site-pkg-dir = "thaw"
 {% endif %}
 assets-dir = "public"
 
