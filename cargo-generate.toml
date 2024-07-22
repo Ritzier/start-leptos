@@ -1,8 +1,20 @@
 [placeholders]
-nightly = { prompt = "Use nightly features?", choices = [
-  "No",
-  "Yes",
-], default = "No", type = "string" }
+style = { prompt = "Use nightly features?", choices = [
+  "Default",
+  "TailwindCSS",
+  "Thaw",
+], default = "Default", type = "string" }
 
-[conditional.'nightly == "No"']
-ignore = ["rust-toolchain.toml"]
+[conditional.'style == "Default"']
+ignore = ["tailwind.config.js", "package.json", "style/input.css"]
+
+[conditional.'style == "TailwindCSS"']
+ignore = ["style/main.scss"]
+
+[conditional.'style == "Thaw"']
+ignore = [
+  "tailwind.config.js",
+  "package.json",
+  "style/input.css",
+  "style/main.scss",
+]

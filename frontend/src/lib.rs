@@ -1,14 +1,12 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use app::*;
+use leptos::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[wasm_bindgen]
+pub fn hydrate() {
+    // initializes logging using the `log` crate
+    _ = console_log::init_with_level(log::Level::Debug);
+    console_error_panic_hook::set_once();
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+    leptos::mount_to_body(App);
 }
