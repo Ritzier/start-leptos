@@ -7,22 +7,46 @@
 
 This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos) web framework and the [cargo-leptos](https://github.com/akesson/cargo-leptos) tool using [Axum](https://github.com/tokio-rs/axum).
 
-## Creating your template repo
+## Creating Leptos Workspace
 
-If you don't have `cargo-leptos` installed you can install it with
+Make sure you have `cargo-leptos` installed before creating your project. You
+can install it using:
 
 ```bash
 cargo install cargo-leptos
 ```
 
-Then run
+## Creating the project:
 
 ```bash
 cargo leptos new --git https://github.com/ritzier/leptos-workspace/
 ```
 
-to generate a new project template.
+This will create a new project directory with the name you specify `{projectname}`
+
+## Runing the project:
+
+Navigate to your project directory and start the development server using:
 
 ```bash
 cd {projectname}
+cargo leptos serve
+```
+
+go to the project and start leptos
+
+### Run with Tailwind:
+
+#### Installation
+
+Install package in `package.json`:
+
+```sh
+npm i
+```
+
+and start the server:
+
+```sh
+cargo leptos serve
 ```
