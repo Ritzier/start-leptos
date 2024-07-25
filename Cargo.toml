@@ -42,8 +42,7 @@ site-pkg-dir = "pkg"
 style-file = "style/main.scss"
 {% endif %}
 {% if style == "TailwindCSS" %}
-style-file = "style/output.css"
-tailwind-input-file = "style/output.css"
+tailwind-input-file = "style/tailwind.css"
 {% endif %}
 {% if style == "Thaw" %}
 site-pkg-dir = "thaw"

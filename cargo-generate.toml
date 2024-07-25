@@ -6,7 +6,7 @@ style = { prompt = "Use nightly features?", choices = [
 ], default = "Default", type = "string" }
 
 [conditional.'style == "Default"']
-ignore = ["tailwind.config.js", "package.json", "style/input.css"]
+ignore = ["tailwind.config.js", "package.json", "style/tailwind.css"]
 
 [conditional.'style == "TailwindCSS"']
 ignore = ["style/main.scss"]
@@ -15,6 +15,6 @@ ignore = ["style/main.scss"]
 ignore = [
   "tailwind.config.js",
   "package.json",
-  "style/input.css",
+  "style/tailwind.css",
   "style/main.scss",
 ]
