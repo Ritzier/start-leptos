@@ -3,10 +3,6 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "scripts": {
-        "build": "npx tailwindcss -i ./style/input.css -o ./style/output.css",
-        "watch": "npx tailwindcss -i ./style/input.css -o ./style/output.css --watch"
-    },
     "devDependencies": {
         "tailwindcss": "^3.4.4"
     }
