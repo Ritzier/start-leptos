@@ -2,6 +2,7 @@
 style = { prompt = "Use nightly features?", choices = [
   "Default",
   "TailwindCSS",
+  "LeptixWithTailwindCSS",
   "Thaw",
 ], default = "Default", type = "string" }
 
@@ -9,6 +10,9 @@ style = { prompt = "Use nightly features?", choices = [
 ignore = ["tailwind.config.js", "package.json", "style/tailwind.css"]
 
 [conditional.'style == "TailwindCSS"']
+ignore = ["style/main.scss"]
+
+[conditional.'style == "LeptixWithTailwindCSS"']
 ignore = ["style/main.scss"]
 
 [conditional.'style == "Thaw"']

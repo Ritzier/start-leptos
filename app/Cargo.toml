@@ -10,7 +10,7 @@ leptos.workspace = true
 leptos_meta.workspace = true
 leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
-{% if style == "Thaw" %}thaw.workspace = true {% endif %}
+{% if style == "Thaw" %}thaw.workspace = true {% endif %} {% if style == "LeptixWithTailwindCSS" %}leptix_primitives.workspace = true {% endif %}
 
 http.workspace = true
 cfg-if.workspace = true
@@ -21,4 +21,5 @@ default = []
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"{% if
 style == "Thaw" %}, "thaw/hydrate"{% endif %}]
 ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"{%
-if style == "Thaw" %}, "thaw/ssr"{% endif %}]
+if style == "Thaw" %}, "thaw/ssr"{% endif %}{% if style ==
+  "LeptixWithTailwindCSS" %}, "leptix_primitives/ssr"{% endif %}]
