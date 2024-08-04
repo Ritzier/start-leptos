@@ -1,5 +1,5 @@
 [placeholders]
-style = { prompt = "Use nightly features?", choices = [
+style = { prompt = "Features?", choices = [
   "Default",
   "TailwindCSS",
   "LeptixWithTailwindCSS",
