@@ -15,6 +15,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-workspace.css"/>
+        <Meta name="viewport" content="width=device-width, initial-scale=1">
 
         // sets the document title
         <Title text="Welcome to Leptos"/>
