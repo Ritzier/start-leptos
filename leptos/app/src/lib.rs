@@ -1,12 +1,10 @@
 use crate::error_template::{AppError, ErrorTemplate};
-use pages::*;
+
+mod error_template;
 
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
-
-pub mod error_template;
-mod pages;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -15,9 +13,8 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Stylesheet id="leptos" href="/pkg/leptos-workspace.css" />
-        <Meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        // sets the document title
+        // sets the document tile
         <Title text="Welcome to Leptos" />
 
         // content for this welcome page
@@ -32,5 +29,18 @@ pub fn App() -> impl IntoView {
                 </Routes>
             </main>
         </Router>
+    }
+}
+
+/// Renders the home page of your application.
+#[component]
+fn HomePage() -> impl IntoView {
+    // Creates a reactive value to update the button
+    let (count, set_count) = create_signal(0);
+    let on_click = move |_| set_count.update(|count| *count += 1);
+
+    view! {
+        <h1>"Welcome to Leptos!"</h1>
+        <button on:click=on_click>"Click Me: "{count}</button>
     }
 }

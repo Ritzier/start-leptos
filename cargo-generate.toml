@@ -1,24 +1,3 @@
-[placeholders]
-style = { prompt = "Features?", choices = [
-  "Default",
-  "TailwindCSS",
-  "LeptixWithTailwindCSS",
-  "Thaw",
-], default = "Default", type = "string" }
-
-[conditional.'style == "Default"']
-ignore = ["tailwind.config.js", "package.json", "style/tailwind.css"]
-
-[conditional.'style == "TailwindCSS"']
-ignore = ["style/main.scss"]
-
-[conditional.'style == "LeptixWithTailwindCSS"']
-ignore = ["style/main.scss"]
-
-[conditional.'style == "Thaw"']
-ignore = [
-  "tailwind.config.js",
-  "package.json",
-  "style/tailwind.css",
-  "style/main.scss",
-]
+[template]
+cargo_generate_version = ">=0.20.0"
+sub_templates = ["leptos"]

@@ -9,10 +9,11 @@ This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos
 
 ## Creating Leptos Workspace
 
-Make sure you have `cargo-leptos` installed before creating your project. You
+Make sure you have `cargo-leptos` and `wasm32-unknown-unknown` installed before creating your project. You
 can install it using:
 
 ```bash
+rustup target add wasm32-unknown-unknown
 cargo install cargo-leptos
 ```
 
@@ -50,3 +51,9 @@ and start the server:
 ```sh
 cargo leptos serve
 ```
+
+## TODO
+
+- update project `leptos` crate to version 0.7
+- add `thaw`
+- add `tailwindcss`
