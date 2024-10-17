@@ -20,7 +20,13 @@ cargo install cargo-leptos
 ## Creating the project:
 
 ```bash
-cargo leptos new --git https://github.com/ritzier/leptos-workspace/
+cargo leptos new --git https://github.com/ritzier/start-leptos-workspace/
+```
+
+or with `cargo generate`:
+
+```bash
+cargo generate ritzier/start-leptos-workspace
 ```
 
 This will create a new project directory with the name you specify `{projectname}`
