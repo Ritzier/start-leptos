@@ -5,4 +5,5 @@ sub_templates = [
   "leptos-workspace",
   "leptos-thaw",
   "leptos-tailwindcss",
+  "leptos-csr",
 ]
