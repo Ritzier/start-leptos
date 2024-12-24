@@ -16,7 +16,6 @@ axum = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 tower = { workspace = true, optional = true }
 tower-http = { workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
 
 [features]
 default = []
@@ -28,6 +27,5 @@ ssr = [
   "dep:leptos_axum",
   "leptos_meta/ssr",
   "leptos_router/ssr",
-  "dep:tracing",
   "app/ssr",
 ]
