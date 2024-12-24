@@ -51,7 +51,7 @@ reload-port = 3001
 site-root = "target/site"
 site-pkg-dir = "pkg"
 style-file = "style/main.scss"
-assert-dir = "public"
+assets-dir = "public"
 
 end2end-cmd = "npx playwright test"
 end2end-dir = "end2end"
