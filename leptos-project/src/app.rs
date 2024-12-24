@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
+use leptos_meta::{provide_meta_context, MetaTags, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
     StaticSegment,
@@ -14,6 +14,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
+                <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+                <link rel="stylesheet" id="leptos" href="/pkg/{{project-name}}.css" />
                 <MetaTags />
             </head>
             <body>
@@ -29,10 +31,6 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        // injects a stylesheet into the docuemnt <head>
-        // id=leptos means cargo-leptos will hot-reload this styleshee
-        <Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />
-
         // sets the document title
         <Title text="Welcome to Leptos" />
 

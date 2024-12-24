@@ -14,6 +14,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
+                <link rel="stylesheet" id="leptos" href="/pkg/{{project-name}}.css" />
+                <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
                 <MetaTags />
             </head>
             <body>
@@ -28,7 +30,6 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />
         <Title text="Welcome to Leptos" />
 
         <Router>
