@@ -12,3 +12,4 @@ lto = true
 leptos = { version = "0.7", features = ["csr"] }
 console_log = "1"
 console_error_panic_hook = "0.1"
+log = "0.4"
