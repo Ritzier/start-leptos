@@ -57,9 +57,3 @@ and start the server:
 ```sh
 cargo leptos serve
 ```
-
-## TODO
-
-- update project `leptos` crate to version 0.7
-- add `thaw`
-- add `tailwindcss`
