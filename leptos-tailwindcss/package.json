@@ -1,9 +1,0 @@
-{
-    "name": "{{project-name}}",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "devDependencies": {
-        "tailwindcss": "^3.4"
-    }
-}
