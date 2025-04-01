@@ -7,3 +7,4 @@ sub_templates = [
   "leptos-tailwindcss",
   "leptos-csr",
 ]
+exclude = ["**/favicon.ico"]
