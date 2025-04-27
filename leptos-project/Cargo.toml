@@ -42,16 +42,21 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-[package.metadata.leptos]
-output-name = "{{project-name}}"
+[[workspace.metadata.leptos]]
+name = "{{project-name}}"
 
-site-addr = "127.0.0.1:3000"
-reload-port = 3001
+bin-package = "server"
+lib-package = "frontend"
+
+style-file = "style/main.scss"
+# tailwind-input-file = "style/tailwind.css"
 
 site-root = "target/site"
 site-pkg-dir = "pkg"
-style-file = "style/main.scss"
 assets-dir = "public"
+
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
 
 end2end-cmd = "npx playwright test"
 end2end-dir = "end2end"
