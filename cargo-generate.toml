@@ -1,10 +1,4 @@
 [template]
 cargo_generate_version = ">=0.20.0"
-sub_templates = [
-  "leptos-project",
-  "leptos-workspace",
-  "leptos-thaw",
-  "leptos-tailwindcss",
-  "leptos-csr",
-]
+sub_templates = ["leptos-workspace", "leptos-project", "leptos-csr"]
 exclude = ["**/favicon.ico"]
