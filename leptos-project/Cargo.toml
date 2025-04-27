@@ -42,11 +42,8 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-[[workspace.metadata.leptos]]
-name = "{{project-name}}"
-
-bin-package = "server"
-lib-package = "frontend"
+[package.metadata.leptos]
+output-name = "two"
 
 style-file = "style/main.scss"
 # tailwind-input-file = "style/tailwind.css"
