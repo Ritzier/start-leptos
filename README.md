@@ -43,18 +43,26 @@ cargo leptos serve
 
 go to the project and start leptos
 
-### Run with Tailwind:
+### Run with Tailwind CSS v4
 
-#### Installation
-
-Install package in `package.json`:
+1. Install Tailwind CSS
 
 ```sh
-npm i
+npm install tailwindcss @tailwindcss/cli
 ```
 
-and start the server:
+2. Create a Tailwind CSS file
 
-```sh
-cargo leptos serve
+Add a CSS file (expamle, `style/tailwind.css`) with following content:
+
+```tailwind.css
+@import "tailwindcss";
+```
+
+3. Configure Tailwind in `Cargo.toml`
+
+under `[[workspace.metadata,leptos]]`, specify the path to your Tailwind CSS file:
+
+```toml
+tailwind-input-file = "style/tailwind.css"
 ```
