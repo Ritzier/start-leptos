@@ -43,7 +43,7 @@ codegen-units = 1
 panic = "abort"
 
 [package.metadata.leptos]
-output-name = "two"
+output-name = "{{project-name}}"
 
 style-file = "style/main.scss"
 # tailwind-input-file = "style/tailwind.css"
