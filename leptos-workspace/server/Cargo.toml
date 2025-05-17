@@ -16,10 +16,10 @@ tokio = { workspace = true, optional = true }
 [features]
 default = []
 ssr = [
+  "app/ssr",
   "dep:axum",
-  "dep:tokio",
   "dep:leptos_axum",
+  "dep:tokio",
   "leptos_meta/ssr",
   "leptos_router/ssr",
-  "app/ssr",
 ]
