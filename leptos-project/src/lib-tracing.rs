@@ -1,7 +1,7 @@
 pub mod app;
 
 #[cfg(feature = "ssr")]
-pub mod trace;
+pub mod ssr;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
