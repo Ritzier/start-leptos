@@ -1,9 +1,12 @@
 mod server;
 mod trace;
 
+use server::Server;
+use trace::Trace;
+
 #[tokio::main]
 async fn main() {
-    trace::setup();
+    Trace::setup();
 
-    server::setup().await;
+    Server::setup().await;
 }

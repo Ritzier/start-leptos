@@ -1,6 +1,8 @@
 mod server;
 
+use server::Server;
+
 #[tokio::main]
 async fn main() {
-    server::setup().await;
+    Server::setup().await;
 }
