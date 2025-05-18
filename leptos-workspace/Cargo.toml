@@ -22,6 +22,10 @@ http = "1"
 log = "0.4.20"
 thiserror = "2"
 tokio = { version = "1", features = ["rt-multi-thread"] }
+{% if tracing %}tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = [
+  "env-filter",
+], optional = true }{% endif %}
 wasm-bindgen = "0.2"
 
 [[workspace.metadata.leptos]]
