@@ -3,7 +3,7 @@
 async fn main() {
     use {{project-name}}::ssr::*;
 
-    server::setup().await;
+    Server::setup().await;
 }
 
 #[cfg(not(feature = "ssr"))]

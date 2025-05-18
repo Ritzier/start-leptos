@@ -1,2 +1,5 @@
-pub mod server;
-pub mod trace;
+mod server;
+mod trace;
+
+pub use server::Server;
+pub use trace::Trace;

@@ -3,8 +3,8 @@
 async fn main() {
     use {{project-name}}::ssr::*;
 
-    trace::setup();
-    server::setup().await;
+    Trace::setup();
+    Server::setup().await;
 }
 
 #[cfg(not(feature = "ssr"))]
