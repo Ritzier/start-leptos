@@ -11,3 +11,4 @@ tracing = { type = "bool", prompt = "Enable tracing?", default = false, only_if 
   { sub_template = "leptos-workspace" },
   { sub_template = "leptos-project" },
 ] } }
+end2end = { type = "bool", prompt = "With end-to-end folder?", default = true }

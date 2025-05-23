@@ -14,3 +14,9 @@ if !is_tracing {
     file::delete("server/Cargo-normal.toml");
     file::rename("server/Cargo-tracing.toml", "server/Cargo.toml");
 }
+
+let is_e2e = variable::get("end2end");
+
+if !is_e2e {
+    file::delete("end-to-end");
+}

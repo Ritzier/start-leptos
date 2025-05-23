@@ -24,3 +24,9 @@ if !is_tracing {
     file::delete("src/ssr-normal.rs");
     file::rename("src/ssr-tracing.rs", "src/ssr.rs");
 }
+
+let is_e2e = variable::get("end2end");
+
+if !is_e2e {
+    file::delete("end-to-end");
+}
