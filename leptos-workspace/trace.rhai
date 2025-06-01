@@ -10,6 +10,12 @@ if !is_tracing {
 
     file::delete("server/Cargo-tracing.toml");
     file::rename("server/Cargo-normal.toml", "server/Cargo.toml");
+
+    file::delete("frontend/src/lib-tracing.rs");
+    file::rename("frontend/src/lib-normal.rs", "frontend/src/lib.rs");
+
+    file::delete("frontend/Cargo-tracing.toml");
+    file::rename("frontend/Cargo-normal.toml", "frontend/Cargo.toml");
 } else {
     file::delete("Cargo-normal.toml");
     file::rename("Cargo-tracing.toml", "Cargo.toml");
@@ -19,6 +25,13 @@ if !is_tracing {
 
     file::delete("server/Cargo-normal.toml");
     file::rename("server/Cargo-tracing.toml", "server/Cargo.toml");
+
+    file::delete("frontend/src/lib-normal.rs");
+    file::rename("frontend/src/lib-tracing.rs", "frontend/src/lib.rs");
+
+    file::delete("frontend/Cargo-normal.toml");
+    file::rename("frontend/Cargo-tracing.toml", "frontend/Cargo.toml");
+
 }
 
 let is_e2e = variable::get("end2end");
