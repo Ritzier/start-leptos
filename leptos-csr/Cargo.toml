@@ -10,6 +10,4 @@ lto = true
 
 [dependencies]
 leptos = { version = "0.8", features = ["csr"] }
-console_log = "1"
 console_error_panic_hook = "0.1"
-log = "0.4"
