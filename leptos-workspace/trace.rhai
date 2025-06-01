@@ -16,6 +16,9 @@ if !is_tracing {
 
     file::delete("frontend/Cargo-tracing.toml");
     file::rename("frontend/Cargo-normal.toml", "frontend/Cargo.toml");
+
+    file::delete("app/Cargo-tracing.toml");
+    file::rename("app/Cargo-normal.toml", "app/Cargo.toml");
 } else {
     file::delete("Cargo-normal.toml");
     file::rename("Cargo-tracing.toml", "Cargo.toml");
@@ -32,6 +35,8 @@ if !is_tracing {
     file::delete("frontend/Cargo-normal.toml");
     file::rename("frontend/Cargo-tracing.toml", "frontend/Cargo.toml");
 
+    file::delete("app/Cargo-normal.toml");
+    file::rename("app/Cargo-tracing.toml", "app/Cargo.toml");
 }
 
 let is_e2e = variable::get("end2end");

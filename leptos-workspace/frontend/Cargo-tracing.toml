@@ -12,6 +12,8 @@ leptos = { workspace = true }
 
 console_error_panic_hook.workspace = true
 wasm-bindgen.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 tracing-subscriber-wasm.workspace = true
 
 [features]
