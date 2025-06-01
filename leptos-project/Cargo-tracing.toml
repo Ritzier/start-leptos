@@ -28,7 +28,6 @@ ssr = [
   "dep:axum",
   "dep:leptos_axum",
   "dep:tokio",
-  "dep:tracing",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
