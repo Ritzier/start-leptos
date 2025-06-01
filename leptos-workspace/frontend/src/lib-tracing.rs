@@ -6,6 +6,7 @@ use tracing_subscriber_wasm::MakeConsoleWriter;
 pub fn hydrate() {
     fmt()
         .with_writer(MakeConsoleWriter::default().map_trace_level_to(tracing::Level::DEBUG))
+        .with_ansi(false)
         .without_time()
         .init();
     console_error_panic_hook::set_once();
