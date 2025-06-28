@@ -58,4 +58,5 @@ if is_style {
     file::delete("style/pages");
     file::delete("style/themes");
     file::delete("style/vendors");
+    file::delete("style/layout");
 }
