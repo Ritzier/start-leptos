@@ -60,3 +60,10 @@ if is_style {
     file::delete("style/vendors");
     file::delete("style/layout");
 }
+
+let stylelint = variable::get("stylelint");
+
+if !stylelint {
+    file::delete("package.json");
+    file::delete("stylelint.config.js");
+}

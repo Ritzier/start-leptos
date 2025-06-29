@@ -13,3 +13,4 @@ tracing = { type = "bool", prompt = "Enable tracing?", default = false, only_if 
 ] } }
 end2end = { type = "bool", prompt = "With end-to-end folder?", default = true }
 style = { type = "bool", prompt = "Full style tree?", default = false }
+stylelint = { type = "bool", prompt = "`stylelint` npm packages?", default = false }
