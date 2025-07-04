@@ -65,5 +65,5 @@ let stylelint = variable::get("stylelint");
 
 if !stylelint {
     file::delete("package.json");
-    file::delete("stylelint.config.js");
+    file::delete("stylelint.config.mjs");
 }
