@@ -34,11 +34,9 @@ pub fn App() -> impl IntoView {
         <Title text="Welcome to Leptos" />
 
         <Router>
-            <main>
-                <Routes fallback=|| "Page not found.".into_view()>
-                    <Route path=path!("") view=HomePage />
-                </Routes>
-            </main>
+            <Routes fallback=|| "Page not found.".into_view()>
+                <Route path=path!("") view=HomePage />
+            </Routes>
         </Router>
     }
 }

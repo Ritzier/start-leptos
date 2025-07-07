@@ -34,11 +34,9 @@ pub fn App() -> impl IntoView {
         <Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />
 
         <Router>
-            <main>
-                <Routes fallback=|| "Page not found".into_view()>
-                    <Route path=path!("") view=HomePage />
-                </Routes>
-            </main>
+            <Routes fallback=|| "Page not found".into_view()>
+                <Route path=path!("") view=HomePage />
+            </Routes>
         </Router>
     }
 }
