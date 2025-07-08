@@ -28,7 +28,7 @@ if !is_tracing {
 let is_e2e = variable::get("end2end");
 
 if !is_e2e {
-    file::delete("end-to-end");
+    file::delete("end2end");
 }
 
 let is_style = variable::get("style");
