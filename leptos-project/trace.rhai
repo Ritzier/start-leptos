@@ -25,12 +25,6 @@ if !is_tracing {
     file::rename("src/ssr-tracing.rs", "src/ssr.rs");
 }
 
-let is_e2e = variable::get("end2end");
-
-if !is_e2e {
-    file::delete("end2end");
-}
-
 let stylelint = variable::get("stylelint");
 
 if !stylelint {

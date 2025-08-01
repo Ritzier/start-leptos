@@ -39,12 +39,6 @@ if !is_tracing {
     file::rename("app/Cargo-tracing.toml", "app/Cargo.toml");
 }
 
-let is_e2e = variable::get("end2end");
-
-if !is_e2e {
-    file::delete("end2end");
-}
-
 let stylelint = variable::get("stylelint");
 
 if !stylelint {
