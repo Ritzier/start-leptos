@@ -45,22 +45,6 @@ if !is_e2e {
     file::delete("end2end");
 }
 
-let is_style = variable::get("style");
-
-if is_style {
-    file::delete("style/main.scss");
-    file::rename("style/main-full.scss", "style/main.scss");
-} else {
-    file::delete("style/main-full.scss");
-    file::delete("style/abstracts");
-    file::delete("style/base");
-    file::delete("style/components");
-    file::delete("style/pages");
-    file::delete("style/themes");
-    file::delete("style/vendors");
-    file::delete("style/layout");
-}
-
 let stylelint = variable::get("stylelint");
 
 if !stylelint {
