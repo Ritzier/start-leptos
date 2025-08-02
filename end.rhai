@@ -9,6 +9,27 @@ switch template {
 
         switch tracing {
             "yes" => {
+                file::delete("Cargo-normal.toml");
+                file::delete("Cargo-normal-cucumber.toml");
+
+                if cucumber == "yes" {
+                    file::rename("Cargo-tracing-cucumber.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing.toml");
+                } else {
+                    file::rename("Cargo-tracing.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing-cucumber.toml");
+                }
+
+                file::delete("src/lib-normal.rs");
+                file::delete("src/main-normal.rs");
+                file::rename("src/lib-tracing.rs", "src/lib.rs");
+                file::rename("src/main-tracing.rs", "src/main.rs");
+
+                file::delete("src/ssr-normal.rs");
+                file::rename("src/ssr-tracing.rs", "src/ssr.rs");
+            }
+
+            _ => {
                 file::delete("src/ssr/trace.rs");
                 file::delete("Cargo-tracing.toml");
                 file::delete("Cargo-tracing-cucumber.toml");
@@ -29,7 +50,13 @@ switch template {
                 file::delete("src/ssr-tracing.rs");
                 file::rename("src/ssr-normal.rs", "src/ssr.rs");
             }
-            _ => {
+
+        }
+    }
+
+    "Workspace" => {
+        switch tracing {
+            "yes" => {
                 file::delete("Cargo-normal.toml");
                 file::delete("Cargo-normal-cucumber.toml");
 
@@ -41,20 +68,23 @@ switch template {
                     file::delete("Cargo-tracing-cucumber.toml");
                 }
 
-                file::delete("src/lib-normal.rs");
-                file::delete("src/main-normal.rs");
-                file::rename("src/lib-tracing.rs", "src/lib.rs");
-                file::rename("src/main-tracing.rs", "src/main.rs");
+                file::delete("server/src/main-normal.rs");
+                file::rename("server/src/main-tracing.rs", "server/src/main.rs");
 
-                file::delete("src/ssr-normal.rs");
-                file::rename("src/ssr-tracing.rs", "src/ssr.rs");
+                file::delete("server/Cargo-normal.toml");
+                file::rename("server/Cargo-tracing.toml", "server/Cargo.toml");
+
+                file::delete("frontend/src/lib-normal.rs");
+                file::rename("frontend/src/lib-tracing.rs", "frontend/src/lib.rs");
+
+                file::delete("frontend/Cargo-normal.toml");
+                file::rename("frontend/Cargo-tracing.toml", "frontend/Cargo.toml");
+
+                file::delete("app/Cargo-normal.toml");
+                file::rename("app/Cargo-tracing.toml", "app/Cargo.toml");
             }
-        }
-    }
 
-    "Workspace" => {
-        switch tracing {
-            "yes" => {
+            _ => {
                 file::delete("Cargo-tracing.toml");
                 file::delete("Cargo-tracing-cucumber.toml");
 
@@ -81,33 +111,6 @@ switch template {
 
                 file::delete("app/Cargo-tracing.toml");
                 file::rename("app/Cargo-normal.toml", "app/Cargo.toml");
-            }
-            _ => {
-                file::delete("Cargo-normal.toml");
-                file::delete("Cargo-normal-cucumber.toml");
-
-                if cucumber == "yes" {
-                    file::rename("Cargo-tracing-cucumber.toml", "Cargo.toml");
-                    file::delete("Cargo-tracing.toml");
-                } else {
-                    file::rename("Cargo-tracing.toml", "Cargo.toml");
-                    file::delete("Cargo-tracing-cucumber.toml");
-                }
-
-                file::delete("server/src/main-normal.rs");
-                file::rename("server/src/main-tracing.rs", "server/src/main.rs");
-
-                file::delete("server/Cargo-normal.toml");
-                file::rename("server/Cargo-tracing.toml", "server/Cargo.toml");
-
-                file::delete("frontend/src/lib-normal.rs");
-                file::rename("frontend/src/lib-tracing.rs", "frontend/src/lib.rs");
-
-                file::delete("frontend/Cargo-normal.toml");
-                file::rename("frontend/Cargo-tracing.toml", "frontend/Cargo.toml");
-
-                file::delete("app/Cargo-normal.toml");
-                file::rename("app/Cargo-tracing.toml", "app/Cargo.toml");
             }
         } 
     } 
