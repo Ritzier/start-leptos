@@ -1,5 +1,6 @@
 let template = variable::get("template");
 let tracing = variable::get("tracing");
+let cucumber = variable::get("cucumber");
 
 switch template {
     "CSR" => {}
@@ -10,7 +11,15 @@ switch template {
             "yes" => {
                 file::delete("src/ssr/trace.rs");
                 file::delete("Cargo-tracing.toml");
-                file::rename("Cargo-normal.toml", "Cargo.toml");
+                file::delete("Cargo-tracing-cucumber.toml");
+
+                if cucumber == "yes" {
+                    file::rename("Cargo-normal-cucumber.toml", "Cargo.toml");
+                    file::delete("Cargo-normal.toml");
+                } else {
+                    file::rename("Cargo-normal.toml", "Cargo.toml");
+                    file::delete("Cargo-normal-cucumber.toml");
+                }
 
                 file::delete("src/lib-tracing.rs");
                 file::delete("src/main-tracing.rs");
@@ -22,7 +31,15 @@ switch template {
             }
             _ => {
                 file::delete("Cargo-normal.toml");
-                file::rename("Cargo-tracing.toml", "Cargo.toml");
+                file::delete("Cargo-normal-cucumber.toml");
+
+                if cucumber == "yes" {
+                    file::rename("Cargo-tracing-cucumber.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing.toml");
+                } else {
+                    file::rename("Cargo-tracing.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing-cucumber.toml");
+                }
 
                 file::delete("src/lib-normal.rs");
                 file::delete("src/main-normal.rs");
@@ -39,7 +56,15 @@ switch template {
         switch tracing {
             "yes" => {
                 file::delete("Cargo-tracing.toml");
-                file::rename("Cargo-normal.toml", "Cargo.toml");
+                file::delete("Cargo-tracing-cucumber.toml");
+
+                if cucumber=="yes" {
+                    file::delete("Cargo-normal.toml");
+                    file::rename("Cargo-normal-cucumber.toml", "Cargo.toml");
+                } else {
+                    file::delete("Cargo-normal-cucumber.toml");
+                    file::rename("Cargo-normal.toml", "Cargo.toml");
+                }
 
                 file::delete("server/src/trace.rs");
                 file::delete("server/src/main-tracing.rs");
@@ -59,7 +84,15 @@ switch template {
             }
             _ => {
                 file::delete("Cargo-normal.toml");
-                file::rename("Cargo-tracing.toml", "Cargo.toml");
+                file::delete("Cargo-normal-cucumber.toml");
+
+                if cucumber == "yes" {
+                    file::rename("Cargo-tracing-cucumber.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing.toml");
+                } else {
+                    file::rename("Cargo-tracing.toml", "Cargo.toml");
+                    file::delete("Cargo-tracing-cucumber.toml");
+                }
 
                 file::delete("server/src/main-normal.rs");
                 file::rename("server/src/main-tracing.rs", "server/src/main.rs");

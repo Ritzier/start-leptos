@@ -1,0 +1,140 @@
+[tasks.start-leptos]
+script = [
+  '''
+source makefile/utils.sh
+
+title="Start Leptos"
+
+# Validate LEPTOS_SITE_ADDR
+if [ -z "${LEPTOS_SITE_ADDR:-}" ]; then
+    print "$title" "Environment variable LEPTOS_SITE_ADDR is not set or empty. Aborting." error
+    exit 1
+fi
+
+port="${LEPTOS_SITE_ADDR##*:}"
+pids=($(lsof -ti:"$port")) || true
+
+# Check if $port is used
+if [ ${#pids[@]} -gt 0 ]; then
+    print "$title" "Port ${BLUE}$port${RC} is already in use. Exiting." error
+    print "$title" "Try run ${GREY}cargo make stop-leptos${RC} to stop server" "none"
+    exit 1
+fi
+
+# Start cargo leptos serve as a coprocess
+coproc SERVER_PROC { cargo leptos serve 2>&1; }
+
+timeout=30
+start_time=$(date +%s)
+
+
+while IFS= read -r line <&"${SERVER_PROC[0]}"; do
+    # Check line
+    if [[ "$line" == *"listening on"* ]]; then
+        # The server is ready, break from loop
+        break
+    fi
+
+    # Check timeout
+    now=$(date +%s)
+    elapsed=$(( now - start_time ))
+    if (( elapsed > timeout )); then
+        print "$title" "Timeout ($timeout s) waiting for server to start"
+        kill "$SERVER_PROC_PID"
+        exit 1
+    fi
+done
+
+# Now the server is running, detach coprocess to background
+exec {SERVER_PROC[0]}>&-
+
+LEPTOS_PID=$SERVER_PROC_PID
+
+print "$title" "Leptos server started successfully with PID ${BLUE}$LEPTOS_PID${RC} on port ${BLUE}$port${RC}"
+''',
+]
+
+
+[tasks.stop-leptos]
+script = [
+  '''
+source ./makefile/utils.sh
+title="Stop Leptos"
+
+if ! [ -f "./env_temp.sh" ]; then
+    print "$title" "Failed to read `env_temp.sh` file" error
+    print "Try `cargo make force-stop-leptos` to force stop leptos" "none" 
+    exit 1
+fi
+
+source "./env_temp.sh"
+
+# Validate LEPTOS_SITE_ADDR
+if [ -z "${LEPTOS_SITE_ADDR:-}" ]; then
+    print "$title" "Environment variable LEPTOS_SITE_ADDR is not set or empty. Aborting." error
+    exit 1
+fi
+
+
+# Validate LEPTOS_OUTPUT_NAME
+if [ -z "${LEPTOS_OUTPUT_NAME:-}" ]; then
+    print "$title" "Environment variable LEPTOS_OUTPUT_NAME is not set or empty. Aborting." error
+    exit 1
+fi
+
+port="${LEPTOS_SITE_ADDR##*:}"
+pids=($(lsof -ti:"$port")) || true
+
+if [ ${#pids[@]} -gt 0 ]; then
+    for pid in "${pids[@]}"; do
+        pname=$(ps -p "$pid" -o comm= | tr -d '[:space:]') # With trimmed
+        
+        # Trimmed $LEPTOS_OUTPUT_NAME
+        expected_name=$(echo "$LEPTOS_OUTPUT_NAME" | tr -d '[:space:]')
+        
+        if [[ "$pname" == "$expected_name" ]]; then
+            print "$title" "Killing $pname (PID $pid) on port $port"
+            kill "$pid"
+
+            # Wait for server shutting down
+            sleep 1
+            if kill -0 "$pid" 2>/dev/null; then
+                print "$title" "Process ${BLUE}$pid${RC} still alive, killing forcibly..."
+                kill -9 "$pid"
+            fi
+        fi
+    done
+else
+    print "$title" "Server process is not found" "warn"
+fi''',
+]
+
+[tasks.force-stop-leptos]
+script = [
+  '''
+source ./makefile/utils.sh
+title="Force Stop Leptos"
+
+if [ -z "${LEPTOS_SITE_ADDR:-}" ]; then
+    print "$title" "Environment variable LEPTOS_SITE_ADDR is not set or empty. Aborting." error
+    exit 1
+fi
+
+port="${LEPTOS_SITE_ADDR##*:}"
+pids=($(lsof -ti:"$port")) || true
+
+if [ ${#pids[@]} -gt 0 ]; then
+    for pid in "${pids[@]}"; do
+        print "$title" "Force killing process PID $pid on port $port"
+        kill -9 "$pid" 2>/dev/null || print "$title" "Failed to kill PID $pid forcibly" warn
+    done
+else
+    print "$title" "No process found using port $port" warn
+fi
+''',
+]
+
+[tasks.cleanup-leptos]
+script = ['''
+rm ./env_temp.sh
+''']

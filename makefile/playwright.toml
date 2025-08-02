@@ -1,0 +1,28 @@
+[tasks.playwright]
+description = "Playwright"
+script = ['''
+#!/bin/bash
+
+cargo make start-leptos
+server_status=$?
+
+# Failed startup server
+if [ $server_status -ne 0 ]; then
+    exit $status
+fi
+
+cd tests/playwright
+npx playwright test
+playwright_status=$?
+
+cd -
+
+# Shutdown Leptos Server
+cargo make stop-leptos
+
+# Cleanup
+cargo make cleanup-leptos
+
+# Return the test exit code
+exit $playwright_status
+''']

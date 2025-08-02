@@ -9,6 +9,7 @@ init = [
   "ask_tracing.rhai",
   "ask_tailwind.rhai",
   "ask_stylelint.rhai",
-  "end.rhai",
   "npm_packages.rhai",
+  "ask_makefile.rhai",
+  "end.rhai",
 ]
