@@ -1,0 +1,59 @@
+[tasks.chrome]
+description = "Run tests in Chrome"
+env = { browser = "chrome" }
+run_task = "test-browser"
+
+[tasks.firefox]
+description = "Run tests in Firefox"
+env = { browser = "firefox" }
+run_task = "test-browser"
+
+[tasks.test-browser]
+description = "Run end-to-end tests in a specific browser"
+args = ["{browser}"]
+script = ['''
+#!/bin/bash
+
+cargo make start-leptos
+server_status=$?
+
+# Failed startup server
+if [ $server_status -ne 0 ]; then
+    exit $status
+fi
+
+# Start tests with specific browser
+if [ "${browser}" = "firefox" ]; then
+    cargo make geckodriver-test
+else
+    cargo make chromedriver-test
+fi
+
+# Shutdown Leptos Server
+cargo make stop-leptos
+
+# Cleanup
+cargo make cleanup-leptos
+''']
+
+[tasks.chromedriver-test]
+env = { WEBDRIVER = "chromedriver" }
+description = "Chromedriver web test"
+script = ['''
+if ! command -v chromedriver &>/dev/null; then
+    echo "chromedriver not found! Please install it first."
+    exit 1
+fi
+cargo run -p cucumber_test
+''']
+
+[tasks.geckodriver-test]
+env = { WEBDRIVER = "geckodriver" }
+description = "Geckodriver web test"
+script = ['''
+if ! command -v geckodriver &>/dev/null; then
+    echo "geckodriver not found! Please install it first."
+    exit 1
+fi
+cargo run -p cucumber_test
+''']

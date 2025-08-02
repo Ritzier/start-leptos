@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "frontend", "server"]
+members = ["app", "frontend", "server", "tests/cucumber_test"]
 
 [profile.wasm-release]
 inherits = "release"
@@ -24,17 +24,6 @@ console_error_panic_hook = "0.1"
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-subscriber-wasm = { version = "0.1.0" }
-
-[dev-dependencies]
-anyhow = "1.0.98"
-cucumber = "0.21.1"
-fantoccini = "0.22.0"
-serde_json = "1.0.141"
-tokio = { version = "1.47.0", features = ["macros", "rt-multi-thread"] }
-
-[[test]]
-name = "cucumber_test"
-harness = false
 
 [[workspace.metadata.leptos]]
 name = "{{project-name}}"
