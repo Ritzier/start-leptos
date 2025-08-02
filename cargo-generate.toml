@@ -1,10 +1,10 @@
 [template]
 cargo_generate_version = ">=0.20.0"
-sub_templates = ["leptos-workspace", "leptos-project", "leptos-csr"]
 exclude = ["**/favicon.ico"]
 
 [hooks]
 post = ["trace.rhai"]
+pre = ["ask_template.rhai"]
 
 [placeholders]
 tracing = { type = "bool", prompt = "Enable tracing?", default = false, only_if = { any_of = [
