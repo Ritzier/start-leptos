@@ -12,4 +12,3 @@ init = [
   "end.rhai",
   "npm_packages.rhai",
 ]
-# post = ["end.rhai", "npm_packages.rhai"]
