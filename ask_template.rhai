@@ -18,6 +18,8 @@ while switch template {
     template = variable::prompt("Which template?", "none", ["Project", "Workspace", "CSR"]);
 }
 
+variable::set("template", template);
+
 file::delete("leptos-csr");
 file::delete("leptos-project");
 file::delete("leptos-workspace");

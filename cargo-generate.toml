@@ -3,12 +3,5 @@ cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
 
 [hooks]
-post = ["trace.rhai"]
-pre = ["ask_template.rhai"]
-
-[placeholders]
-tracing = { type = "bool", prompt = "Enable tracing?", default = false, only_if = { any_of = [
-  { sub_template = "leptos-workspace" },
-  { sub_template = "leptos-project" },
-] } }
-stylelint = { type = "bool", prompt = "`stylelint` npm packages?", default = false }
+pre = ["ask_template.rhai", "ask_tracing.rhai"]
+post = ["end.rhai"]
