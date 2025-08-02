@@ -21,12 +21,14 @@ if [ ${#pids[@]} -gt 0 ]; then
     exit 1
 fi
 
+# Start spinner
+spinner "Building and starting Leptos server, please wait..." &
+SPINNER_PID=$!
+# Make sure the `SPINNER_PID` killed when program interrupted
+trap 'kill $SPINNER_PID 2>/dev/null; exit' SIGINT SIGTERM EXIT
+
 # Start cargo leptos serve as a coprocess
 coproc SERVER_PROC { cargo leptos serve 2>&1; }
-
-timeout=30
-start_time=$(date +%s)
-
 
 while IFS= read -r line <&"${SERVER_PROC[0]}"; do
     # Check line
@@ -34,16 +36,12 @@ while IFS= read -r line <&"${SERVER_PROC[0]}"; do
         # The server is ready, break from loop
         break
     fi
-
-    # Check timeout
-    now=$(date +%s)
-    elapsed=$(( now - start_time ))
-    if (( elapsed > timeout )); then
-        print "$title" "Timeout ($timeout s) waiting for server to start"
-        kill "$SERVER_PROC_PID"
-        exit 1
-    fi
 done
+
+# Stop the spinner process
+kill $SPINNER_PID 2>/dev/null
+# Clear the spinner line
+printf "\r%s"
 
 # Now the server is running, detach coprocess to background
 exec {SERVER_PROC[0]}>&-

@@ -32,3 +32,16 @@ print() {
         ;;
     esac
 }
+
+spinner() {
+    local message="$1"
+    # These are nice-looking braille characters for the spinner
+    local chars="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    while :; do
+        for ((i = 0; i < ${#chars}; i++)); do
+            # Use printf with \r to return to the beginning of the line
+            printf "\r${GREY}%s %s${RC}" "${chars:$i:1}" "$message"
+            sleep 0.1
+        done
+    done
+}
