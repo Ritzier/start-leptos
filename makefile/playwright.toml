@@ -1,28 +1,58 @@
 [tasks.playwright]
-description = "Playwright"
-script = ['''
-#!/bin/bash
+description = "Run Playwright tests with automatic setup"
+env = { PLAYWRIGHT_DIR = "tests/playwright" }
+script = [
+  '''
+source ./makefile/utils.sh
 
-cargo make start-leptos
-server_status=$?
+# Check node packages
+install_deps "$PLAYWRIGHT_DIR" "playwright"
 
-# Failed startup server
-if [ $server_status -ne 0 ]; then
-    exit $status
+title="Playwright Tests"
+
+print "$title" "Starting Playwright test suite..."
+
+# Start Leptos server
+print "$title" "Starting Leptos server..."
+if ! cargo make start-leptos; then
+    print "$title" "Failed to start Leptos server" error
+    exit 1
 fi
 
-cd tests/playwright
+# Validate server is responding
+url="http://${LEPTOS_SITE_ADDR}"
+if ! wait_for_http "$url" 10; then
+    print "$title" "Leptos server not responding at $url" error
+    cargo make stop-leptos
+    exit 1
+fi
+
+# Change to playwright directory
+if ! cd "$PLAYWRIGHT_DIR"; then
+    print "$title" "Failed to navigate to $PLAYWRIGHT_DIR directory" error
+    cargo make stop-leptos
+    exit 1
+fi
+
+# Run Playwright tests
+print "$title" "Running Playwright tests..."
 npx playwright test
 playwright_status=$?
 
-cd -
+# Return to project root
+cd - > /dev/null
 
-# Shutdown Leptos Server
+# Always cleanup
+print "$title" "Cleaning up..."
 cargo make stop-leptos
 
-# Cleanup
-cargo make cleanup-leptos
+# Report results
+if [ $playwright_status -eq 0 ]; then
+    print "$title" "All Playwright tests passed!"
+else
+    print "$title" "Playwright tests failed with exit code $playwright_status" error
+fi
 
-# Return the test exit code
 exit $playwright_status
-''']
+''',
+]

@@ -45,3 +45,62 @@ spinner() {
         done
     done
 }
+
+wait_for_http() {
+    local url=$1
+    local timeout=${2:-30}
+    local count=0
+
+    print "Health Check" "Waiting for $url to respond..." debug
+
+    while [ $count -lt $timeout ]; do
+        if curl -s --connect-timeout 2 --max-time 5 "$url" >/dev/null 2>&1; then
+            return 0
+        fi
+
+        sleep 1
+        count=$((count + 1))
+
+        if [ $((count % 10)) -eq 0 ]; then
+            print "Health Check" "Still waiting for HTTP response... (${count}s/${timeout}s)" debug
+        fi
+    done
+    return 1
+}
+
+check_port() {
+    local port=$1
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -tlnp 2>/dev/null | grep -q ":$port "
+    elif command -v ss >/dev/null 2>&1; then
+        ss -tlnp 2>/dev/null | grep -q ":$port "
+    else
+        return 1
+    fi
+}
+
+install_deps() {
+    local dir="$1"
+    local context="$2"
+    local title="Node Packages"
+
+    if [ ! -f "$dir/package.json" ]; then
+        return 0
+    fi
+
+    cd "$dir"
+
+    if [ ! -d "node_modules" ]; then
+        print "$title" "Installing $context dependencies..."
+        npm install
+    elif [ "package.json" -nt "node_modules" ]; then
+        print "$title" "Updating $context dependencies..."
+        npm install
+    else
+        print "$title" "$context dependencies are up to date"
+    fi
+
+    cd - >/dev/null
+}

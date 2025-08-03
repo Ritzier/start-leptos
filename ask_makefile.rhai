@@ -14,29 +14,22 @@ let playwright = variable::prompt("Playwright test?", "no", ["yes", "no"]);
 let template = variable::get("template");
 
 switch template {
+    // Toml include `[config]\ndefault_to_workspace=false`
     "Workspace" => {
-        file::delete("makefile/leptos.toml");
-        file::rename("makefile/leptos-workspace.toml", "makefile/leptos.toml");
-        file::delete("makefile/cucumber.toml");
-        file::rename("makefile/cucumber-workspace.toml", "makefile/cucumber.toml");
-
-        file::delete("tests/cucumber_test");
-        file::rename("tests/cucumber_test_workspace", "tests/cucumber_test");
-
         if playwright == "yes" && cucumber == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             return;
         }
 
         if cucumber == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" }\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" }\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             file::delete("makefile/playwright.toml");
             file::delete("tests/playwright.toml");
             return;
         }
 
         if playwright == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/playwright.toml\" }\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/playwright.toml\" }\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             file::delete("makefile/cucumber.toml");
             file::delete("tests/cucumber_test");
             return;
@@ -44,11 +37,6 @@ switch template {
     }
 
     _ => {
-        file::delete("makefile/leptos-workspace.toml");
-        file::delete("makefile/cucumber-workspace.toml");
-
-        file::delete("tests/cucumber_test_workspace");
-
         if playwright == "yes" && cucumber == "yes" {
             file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
             return;

@@ -1,59 +1,95 @@
 [tasks.chrome]
-description = "Run tests in Chrome"
-env = { browser = "chrome" }
-run_task = "test-browser"
+env = { WEBDRIVER_TEST = ["chromedriver"] }
+run_task = "run-cucumber"
 
 [tasks.firefox]
-description = "Run tests in Firefox"
-env = { browser = "firefox" }
-run_task = "test-browser"
+env = { WEBDRIVER_TEST = ["geckodriver"] }
+run_task = "run-cucumber"
 
-[tasks.test-browser]
-description = "Run end-to-end tests in a specific browser"
-args = ["{browser}"]
+[tasks.both]
+env = { WEBDRIVER_TEST = ["chromedriver", "geckodriver"] }
+run_task = "run-cucumber"
+
+[tasks.run-cucumber]
+description = "Run Cucumber tests with specified WebDrivers"
 script = ['''
-#!/bin/bash
+source ./makefile/utils.sh
 
-cargo make start-leptos
-server_status=$?
+title="Cucumber Tests"
 
-# Failed startup server
-if [ $server_status -ne 0 ]; then
-    exit $status
+# Parse WEBDRIVER_TEST array (comes as space-separated string from env)
+drivers_str="${WEBDRIVER_TEST:-chromedriver}"
+# Convert to array by splitting on spaces
+IFS=' ' read -ra drivers <<< "$drivers_str"
+
+# Exit if no drivers
+if [ ${#drivers[@]} -eq 0 ] || [ "${drivers[0]}" = "" ]; then
+    print "$title" "No WebDrivers specified, exiting"
+    exit 0
 fi
 
-# Start tests with specific browser
-if [ "${browser}" = "firefox" ]; then
-    cargo make geckodriver-test
+print "$title" "Starting Cucumber tests with drivers: ${drivers[*]}"
+
+# Start Leptos server
+if ! cargo make start-leptos; then
+    print "$title" "Failed to start Leptos server" error
+    exit 1
+fi
+
+url="http://${LEPTOS_SITE_ADDR}"
+
+# Track overall test results
+failed_drivers=()
+total_tests=0
+passed_tests=0
+
+# Run tests for each WebDriver
+for driver in "${drivers[@]}"; do
+    print "$title" "Running tests with $driver"
+    
+    # Check if WebDriver is available
+    if ! command -v "$driver" &>/dev/null; then
+        print "$title" "$driver not found! Skipping..." warn
+        failed_drivers+=("$driver (not found)")
+        continue
+    fi
+    
+    # Set the current WebDriver for the test
+    export WEBDRIVER="$driver"
+    
+    # Run the test
+    total_tests=$((total_tests + 1))
+    if cargo run -p cucumber_test; then
+        print "$title" "$driver tests: PASSED"
+        passed_tests=$((passed_tests + 1))
+    else
+        print "$title" "$driver tests: FAILED" error
+        failed_drivers+=("$driver")
+    fi
+    
+    # Delay 2s between different WebDriver tests
+    if [ ${#drivers[@]} -gt 1 ]; then
+        sleep 2
+    fi
+done
+
+print "$title" "Cleaning up..."
+
+if ! cargo make stop-leptos; then
+    print "$title" "Failed to stop Leptos server" warn
+fi
+
+# Report final results
+print "$title" "Test Results Summary:"
+print "$title" "Total WebDrivers tested: $total_tests"
+print "$title" "Passed: $passed_tests"
+print "$title" "Failed: $((total_tests - passed_tests))"
+
+if [ ${#failed_drivers[@]} -eq 0 ]; then
+    print "$title" "All tests passed successfully!"
+    exit 0
 else
-    cargo make chromedriver-test
-fi
-
-# Shutdown Leptos Server
-cargo make stop-leptos
-
-# Cleanup
-cargo make cleanup-leptos
-''']
-
-[tasks.chromedriver-test]
-env = { WEBDRIVER = "chromedriver" }
-description = "Chromedriver web test"
-script = ['''
-if ! command -v chromedriver &>/dev/null; then
-    echo "chromedriver not found! Please install it first."
+    print "$title" "Failed drivers: ${failed_drivers[*]}" error
     exit 1
 fi
-cargo test
-''']
-
-[tasks.geckodriver-test]
-env = { WEBDRIVER = "geckodriver" }
-description = "Geckodriver web test"
-script = ['''
-if ! command -v geckodriver &>/dev/null; then
-    echo "geckodriver not found! Please install it first."
-    exit 1
-fi
-cargo test
 ''']
