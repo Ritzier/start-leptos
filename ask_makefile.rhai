@@ -16,6 +16,9 @@ let template = variable::get("template");
 switch template {
     // Toml include `[config]\ndefault_to_workspace=false`
     "Workspace" => {
+        file::delete("tests/cucumber_test");
+        file::rename("tests/cucumber_test_workspace", "tests/cucumber_test");
+
         if playwright == "yes" && cucumber == "yes" {
             file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             return;
@@ -37,6 +40,8 @@ switch template {
     }
 
     _ => {
+        file::delete("tests/cucumber_test_workspace");
+
         if playwright == "yes" && cucumber == "yes" {
             file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
             return;
