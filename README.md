@@ -5,64 +5,70 @@
 
 # Leptos Axum Starter Template
 
-This is a template for use with the [Leptos](https://github.com/leptos-rs/leptos) web framework and the
-[cargo-leptos](https://github.com/akesson/cargo-leptos) tool using [Axum](https://github.com/tokio-rs/axum).
+A comprehensive template for building modern web applications with the [Leptos](https://github.com/leptos-rs/leptos) web
+framework and [Axum](https://github.com/tokio-rs/axum). This template includes optional testing frameworks and
+development tools
 
-## Creating Leptos Workspace
+## Feature
 
-Make sure you have `cargo-leptos` and `wasm32-unknown-unknown` installed before creating your project. You can install
-it using:
+- **Multiple Template Types**: Choose between `CSR`, `Project`, or `Workspace` configurations
 
-```bash
+- **Testing Integration**: Optional `Cucumber` and `Playwright` test suites
+
+- **Tracing Support**: Optional structured logging with tracing
+
+- **Tailwind CSS v4**: Modern `CSS` framework integration
+
+- **WebDriver Testing**: Multi-browser support with `Chrome` and `Firefox`
+
+## Prerequisites
+
+```sh
+# Install Rust WebAssembly target
 rustup target add wasm32-unknown-unknown
+
+# Install Leptos CLI
 cargo install cargo-leptos
+
+# Install cargo-generate (if using cargo generate method)
+cargo install cargo-generate
+
+# Install cargo-make for task automation
+cargo install cargo-make
 ```
 
-## Creating the project:
+<details>
+<summary>cargo-binstall</summary>
 
 ```bash
-cargo leptos new --git https://github.com/ritzier/start-leptos-workspace/
+# Install Rust WebAssembly target
+rustup target add wasm32-unknown-unknown
+
+cargo binstall cargo-leptos cargo-generate cargo-make
 ```
 
-or with `cargo generate`:
+</details>
+
+## Creating Project
+
+**Method 1**: Using `cargo-generate`
 
 ```bash
 cargo generate ritzier/start-leptos-workspace
 ```
 
-This will create a new project directory with the name you specify `{projectname}`
-
-## Runing the project:
-
-Navigate to your project directory and start the development server using:
+**Method 2**: Using `cargo-leptos`
 
 ```bash
-cd {projectname}
-cargo leptos serve
+cargo leptos new --git https://github.com/ritzier/start-leptos-workspace/
 ```
 
-go to the project and start leptos
+During setup, you'll be prompted to choose:
 
-### Run with Tailwind CSS v4
+- **Template type**: CSR, Project, or Workspace
 
-1. Install Tailwind CSS
+- **Tracing**: Enable structured logging
 
-```sh
-npm install tailwindcss @tailwindcss/cli
-```
+- **Cucumber testing**: Browser-based integration tests
 
-2. Create a Tailwind CSS file
-
-Add a CSS file (expamle, `style/tailwind.css`) with following content:
-
-```tailwind.css
-@import "tailwindcss";
-```
-
-3. Configure Tailwind in `Cargo.toml`
-
-under `[[workspace.metadata,leptos]]`, specify the path to your Tailwind CSS file:
-
-```toml
-tailwind-input-file = "style/tailwind.css"
-```
+- **Playwright testing**: End-to-end testing framework
