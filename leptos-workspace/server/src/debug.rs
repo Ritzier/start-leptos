@@ -1,5 +1,3 @@
-use std::env;
-
 pub struct Env;
 
 impl Env {
