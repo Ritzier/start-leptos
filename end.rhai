@@ -2,6 +2,8 @@ let template = variable::get("template");
 let tracing = variable::get("tracing");
 let cucumber = variable::get("cucumber");
 
+file::delete("README.md");
+
 switch template {
     "CSR" => {}
 
