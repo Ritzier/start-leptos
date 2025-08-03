@@ -11,4 +11,5 @@ async fn main() {
     Server::setup().await;
 }
 
+#[cfg(not(feature = "ssr"))]
 fn main() {}

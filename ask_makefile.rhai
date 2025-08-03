@@ -43,19 +43,19 @@ switch template {
         file::delete("tests/cucumber_test_workspace");
 
         if playwright == "yes" && cucumber == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             return;
         }
 
         if cucumber == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" }\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" }\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             file::delete("makefile/playwright.toml");
             file::delete("tests/playwright.toml");
             return;
         }
 
         if playwright == "yes" {
-            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/playwright.toml\" }\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"");
+            file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/playwright.toml\" }\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
             file::delete("makefile/cucumber.toml");
             file::delete("tests/cucumber_test");
             return;
