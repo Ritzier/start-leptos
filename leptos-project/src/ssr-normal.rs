@@ -1,5 +1,8 @@
-mod debug;
 mod server;
 
-pub use debug::Env;
 pub use server::Server;
+
+#[cfg(debug_assertions)]
+mod debug;
+#[cfg(debug_assertions)]
+pub use debug::Env;
