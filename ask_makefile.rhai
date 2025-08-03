@@ -18,6 +18,8 @@ switch template {
     "Workspace" => {
         file::delete("tests/cucumber_test");
         file::rename("tests/cucumber_test_workspace", "tests/cucumber_test");
+        file::delete("makefile/cucumber.toml");
+        file::rename("makefile/cucumber-workspace.toml", "makefile/cucumber.toml");
 
         if playwright == "yes" && cucumber == "yes" {
             file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
@@ -41,6 +43,7 @@ switch template {
 
     _ => {
         file::delete("tests/cucumber_test_workspace");
+        file::delete("makefile/cucumber-workspace.toml");
 
         if playwright == "yes" && cucumber == "yes" {
             file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" },\n  { path = \"makefile/cucumber.toml\" },\n  { path = \"makefile/playwright.toml\" },\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");

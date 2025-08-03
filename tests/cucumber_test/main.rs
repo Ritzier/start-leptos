@@ -11,7 +11,7 @@ use cucumber::World;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    for entry in fs::read_dir("tests/test_web/features")? {
+    for entry in fs::read_dir("tests/cucumber_test/features")? {
         let path = entry?.path();
         if path.extension() == Some(OsStr::new("feature")) {
             AppWorld::cucumber()
