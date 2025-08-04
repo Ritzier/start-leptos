@@ -39,6 +39,8 @@ switch template {
             file::delete("tests/cucumber_test");
             return;
         }
+
+        file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" }\n]\n[config]\ndefault_to_workspace = false\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
     }
 
     _ => {
@@ -63,6 +65,8 @@ switch template {
             file::delete("tests/cucumber_test");
             return;
         }
+
+        file::write("Makefile.toml", "extend = [\n  { path = \"makefile/leptos.toml\" }\n]\n\n[env]\nLEPTOS_SITE_ADDR = \"127.0.0.1:3000\"\nPID_FILE = \"target/.leptos.pid\"");
     }
 }
 
