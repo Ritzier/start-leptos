@@ -15,6 +15,8 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <AutoReload options=options.clone() />
                 <HashedStylesheet options=options.clone() />
                 <HydrationScripts options />
+                <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico" />
+                <Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />
                 <MetaTags />
             </head>
             <body>
@@ -30,8 +32,6 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Title text="Welcome to Leptos!" />
-        <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico" />
-        <Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />
 
         <Router>
             <Routes fallback=|| "Page not found".into_view()>
