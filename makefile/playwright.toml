@@ -3,6 +3,8 @@ description = "Run Playwright tests with automatic setup"
 env = { PLAYWRIGHT_DIR = "tests/playwright" }
 script = [
   '''
+#!/bin/bash
+
 source ./makefile/utils.sh
 
 # Check node packages
