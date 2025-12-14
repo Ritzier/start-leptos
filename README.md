@@ -57,13 +57,15 @@ cargo make both
 ```mermaid
 flowchart TD
     A[Start] --> B[Choose: Project/Workspace]
-    B --> C{Makefile?}
-    C -->|No| D[Basic Leptos + Axum]
-    C -->|Yes| E{Cucumber?<br/>Playwright?}
-    E --> F[Generate:<br/>Cargo.toml + Makefile.toml]
-    F --> G[Auto-cleanup unused files]
-    D --> H[🚀 Ready]
-    G --> H
+    B --> C{Style?<br/>default/unocss}
+    C --> D{Makefile?}
+    D -->|No| E[Basic Leptos + Axum]
+    D -->|Yes| F{Cucumber?<br/>Playwright?}
+    F --> G[Generate:<br/>Cargo.toml + Makefile.toml]
+    G --> H[Auto-cleanup unused files]
+    E --> I[🚀 Ready]
+    H --> I
+
 ```
 
 ## Structure
@@ -72,11 +74,24 @@ flowchart TD
 my-leptos-app/
 ├── Cargo.toml             # Workspace config
 ├── Makefile.toml          # Task runner
-├── app/                   # Shared logic (Workspace only)
-├── frontend/              # WASM lib (Workspace only)
-├── server/                # Axum server (Workspace only)
-├── src/                   # App + SSR (Project only)
+├── uno.config.ts         # UnoCSS config (if selected)
+├── package.json          # UnoCSS deps (if selected)
+├── app/                  # Shared logic (Workspace only)
+├── frontend/             # WASM lib (Workspace only)
+├── server/               # Axum server (Workspace only)
+├── src/                  # App + SSR (Project only)
+├── public/uno.css        # Generated UnoCSS (if selected)
 ├── tests/
-│   └── cucumber_test/     # Cucumber BDD tests
-└── tests/playwright/      # Playwright E2E
+│   └── cucumber_test/    # Cucumber BDD tests
+└── tests/playwright/     # Playwright E2E
 ```
+
+## Styling Options
+
+- **Default**: Uses Leptos built-in CSS bundling (`/pkg/{{project-name}}.css`)
+
+- **UnoCSS**: Atomic CSS engine with:
+  - Auto pattern scanning from `src/**/*.rs` (Project) or `app/**/*.rs` (Workspace)
+  - Output to `public/uno.css`
+  - `npm run watch` for development HMR
+  - `npm run build` for production minification
