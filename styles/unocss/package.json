@@ -1,0 +1,9 @@
+{
+    "devDependencies": {
+        "unocss": "^66.5.5"
+    },
+    "scripts": {
+        "watch": "unocss --watch",
+        "build": "unocss --minify"
+    }
+}

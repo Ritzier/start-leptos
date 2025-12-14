@@ -52,6 +52,27 @@ while switch template {
 }
 
 // ===== Style =====
+let style = variable::prompt("Style?", "default", ["default", "unocss"]);
+switch style {
+    "unocss" => {
+        file::rename("styles/unocss/package.json", "package.json");
+
+        // `uno.config.ts`
+        let content = "import { defineConfig, presetMini } from \"unocss\";\n\nexport default defineConfig({\n  cli: {\n    entry: {\n      patterns: [\"";
+        if template == "Workspace" {
+            content += "app/**/*.rs";
+        } else {
+            content += "src/**/*.rs";
+        }
+        content += "],\n      outFile: \"public/uno.css\",\n    },\n  },\n  presets: [presetMini()],\n});";
+        file::write("uno.config.ts", content);
+    }
+
+    _ => {}
+}
+
+// Cleanup
+file::delete("styles");
 
 // ===== Makefile =====
 // Makefile (optional)
@@ -120,6 +141,8 @@ if makefile == "yes" {
   file::delete("makefile");
   file::delete("tests");
 }
+
+
 
 // clean up
 file::delete("hooks");
