@@ -3,13 +3,4 @@ cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
 
 [hooks]
-init = [
-  "ask_project_name.rhai",
-  "ask_template.rhai",
-  "ask_tracing.rhai",
-  "ask_tailwind.rhai",
-  "ask_stylelint.rhai",
-  "npm_packages.rhai",
-  "ask_makefile.rhai",
-  "end.rhai",
-]
+init = ["hooks/init.rhai"]
