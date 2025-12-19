@@ -64,7 +64,7 @@ switch style {
         } else {
             content += "src/**/*.rs";
         }
-        content += "],\n      outFile: \"public/uno.css\",\n    },\n  },\n  presets: [presetMini()],\n});";
+        content += "\"],\n      outFile: \"public/uno.css\",\n    },\n  },\n  presets: [presetMini()],\n});";
         file::write("uno.config.ts", content);
     }
 
