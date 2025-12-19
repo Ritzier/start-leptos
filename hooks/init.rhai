@@ -51,6 +51,10 @@ while switch template {
     template = variable::prompt("Which template?", "none", ["Project", "Workspace"]);
 }
 
+// ===== Lazy Loading(--split) =====
+let lazy = variable::prompt("Lazy Loading(--split)?", "no", ["yes", "no"]); 
+variable::set("lazy", lazy);
+
 // ===== Style =====
 let style = variable::prompt("Style?", "default", ["default", "unocss"]);
 switch style {

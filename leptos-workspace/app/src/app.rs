@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_meta::provide_meta_context;
 use leptos_router::components::{Route, Router, Routes};
-use leptos_router::path;
+{% if lazy == "no" %}use leptos_router::path{% else %}use leptos_router::{Lazy, path};{% endif %}
 
 use crate::pages::*;
 
@@ -12,7 +12,7 @@ pub fn App() -> impl IntoView {
     view! {
         <Router>
             <Routes fallback=|| "Page not found".into_view()>
-                <Route path=path!("") view=HomePage />
+                {% if lazy == "no" %}<Route path=path!("") view=HomePage />{% else %}<Route path=path!("") view={Lazy::<HomePage>::new()} />{% endif %}
             </Routes>
         </Router>
     }

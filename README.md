@@ -29,6 +29,7 @@ cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
 ```
 ? What is the project name? my-leptos-app
 ? Which template? (Project/Workspace) Workspace
+? Lazy loading(--split)? yes
 ? Makefile (leptos startup, tests)? yes
 ? Cucumber test? yes
 ? Playwright test? no
