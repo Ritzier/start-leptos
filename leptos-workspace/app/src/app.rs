@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos_meta::provide_meta_context;
 use leptos_router::components::{Route, Router, Routes};
-{% if lazy == "no" %}use leptos_router::path{% else %}use leptos_router::{Lazy, path};{% endif %}
+{% if lazy == "no" %}use leptos_router::path;{% else %}use leptos_router::{Lazy, path};{% endif %}
 
 use crate::pages::*;
 
