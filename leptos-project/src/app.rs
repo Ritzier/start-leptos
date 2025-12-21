@@ -16,7 +16,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HashedStylesheet options=options.clone() />
                 <HydrationScripts options />
                 <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
-                {% if styles == unocss %}<Stylesheet id="uno" href="/unocss.css" />{%else%}<Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />{% endif %}
+                {% if styles == "unocss" %}<Stylesheet id="uno" href="/unocss.css" />{%else%}<Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />{% endif %}
                 <MetaTags />
             </head>
             <body>

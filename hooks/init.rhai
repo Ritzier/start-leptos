@@ -75,6 +75,8 @@ switch style {
     _ => {}
 }
 
+/// Add to global variable
+variable::set("style", style);
 // Cleanup
 file::delete("styles");
 
