@@ -1,7 +1,7 @@
 [template]
 cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
-ignore = ["README.md"]
+ignore = ["README.md", "TODO.md"]
 
 [hooks]
 init = ["hooks/init.rhai"]
