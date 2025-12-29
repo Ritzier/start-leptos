@@ -26,14 +26,14 @@ cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
 
 ### Interacitve Prompts
 
-```
+````
 ? What is the project name? my-leptos-app
-? Which template? (Project/Workspace) Workspace
 ? Lazy loading(--split)? yes
-? Makefile (leptos startup, tests)? yes
-? Cucumber test? yes
-? Playwright test? no
-```
+? Style? default
+? Makefile? yes
+? Makefile: (Choose with space, confirm with Enter)
+[x] Cucumber
+[ ] Playwright```
 
 ### Commands
 
@@ -51,40 +51,29 @@ cargo make playwright    # Playwright E2E
 
 # Full test suite
 cargo make both
-```
-
-## Workflow
-
-```mermaid
-flowchart TD
-    A[Start] --> B[Choose: Project/Workspace]
-    B --> C{Style?<br/>default/unocss}
-    C --> D{Makefile?}
-    D -->|No| E[Basic Leptos + Axum]
-    D -->|Yes| F{Cucumber?<br/>Playwright?}
-    F --> G[Generate:<br/>Cargo.toml + Makefile.toml]
-    G --> H[Auto-cleanup unused files]
-    E --> I[🚀 Ready]
-    H --> I
-
-```
+````
 
 ## Structure
 
 ```text
 my-leptos-app/
-├── Cargo.toml             # Workspace config
-├── Makefile.toml          # Task runner
-├── uno.config.ts         # UnoCSS config (if selected)
-├── package.json          # UnoCSS deps (if selected)
-├── app/                  # Shared logic (Workspace only)
-├── frontend/             # WASM lib (Workspace only)
-├── server/               # Axum server (Workspace only)
-├── src/                  # App + SSR (Project only)
-├── public/uno.css        # Generated UnoCSS (if selected)
-├── tests/
-│   └── cucumber_test/    # Cucumber BDD tests
-└── tests/playwright/     # Playwright E2E
+├── Cargo.toml          # Workspace config
+├── Makefile.toml       # Task runner (optional)
+├── uno.config.ts       # UnoCSS config (if selected)
+├── package.json        # UnoCSS deps (if selected)
+├── app/                # Shared app logic
+├── frontend/           # WASM library
+├── server/             # Axum SSR server
+├── style/              # SCSS styles
+├── public/
+│ └── uno.css           # Generated UnoCSS (if selected)
+├── makefile/           # Task definitions (optional)
+│ ├── leptos.toml
+│ ├── cucumber.toml     # If Cucumber selected
+│ └── playwright.toml   # If Playwright selected
+└── tests/
+    ├── cucumber_test/  # BDD tests (if selected)
+    └── playwright/     # E2E tests (if selected)
 ```
 
 ## Styling Options
@@ -96,3 +85,27 @@ my-leptos-app/
   - Output to `public/uno.css`
   - `npm run watch` for development HMR
   - `npm run build` for production minification
+
+## Testing Frameworks
+
+### Cucumber (BDD)
+
+- WebDriver-based browser automation with `Fantoccini`
+- Supports Chrome (`chromedriver`) and Firefox (`geckodriver`)
+- Feature files in `tests/cucumber_test/features/`
+- Run: `cargo make chrome` or `cargo make both`
+
+### Playwright
+
+- Modern E2E testing with Node.js runtime
+- Cross-browser support (Chromium/Firefox/WebKit)
+- TypeScript test files in `tests/playwright/`
+- Run: `cargo make playwright`
+
+## Template Features
+
+- **Workspace architecture**: Modular `app/frontend/server` separation
+- **Lazy loading**: Optional code-splitting with `--split` flag
+- **Conditional test setup**: Only includes selected test frameworks
+- **Auto-cleanup**: Template removes unused files after generation
+- **Hot reload**: Leptos watch mode with live CSS injection
