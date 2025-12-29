@@ -3,5 +3,15 @@ cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
 ignore = ["README.md", "TODO.md"]
 
+[placeholders]
+ask_makefile = { prompt = "Makefile?", type = "bool", default = false }
+
+[conditional.'ask_makefile'.placeholders]
+makefile = { prompt = "Makefile", type = "array", choices = [
+  "Cucumber",
+  "Playwright",
+] }
+
 [hooks]
 init = ["hooks/init.rhai"]
+post = ["hooks/post.rhai"]
