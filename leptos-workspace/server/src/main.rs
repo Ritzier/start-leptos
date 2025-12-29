@@ -1,16 +1,13 @@
-#[cfg(debug_assertions)]
-mod debug;
-#[cfg(debug_assertions)]
-use debug::Env;
-
-mod server;
-
-use server::Server;
-
+#[cfg(feature = "ssr")]
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), server::Error> {
+    use server::*;
+
     #[cfg(debug_assertions)]
     Env::setup().await;
 
-    Server::setup().await;
+    Server::setup().await
 }
+
+#[cfg(not(feature = "ssr"))]
+fn main() {}
