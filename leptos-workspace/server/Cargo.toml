@@ -10,18 +10,12 @@ leptos_meta = { workspace = true, optional = true }
 leptos_router = { workspace = true, optional = true }
 leptos = { workspace = true }
 
-# WASM
-wasm-bindgen = "0.2"
-
 # Server runtime
-axum = "0.8"
-tokio = { version = "1" }
+axum = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["rt-multi-thread"], optional = true }
 
 # Better error handling
-thiserror = "2"
-
-# Logging
-console_error_panic_hook = "0.1" # Better panic messages in browser console
+thiserror = { workspace = true, optional = true }
 
 [features]
 default = []
