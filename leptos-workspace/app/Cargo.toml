@@ -20,6 +20,11 @@ rkyv = { workspace = true, features = ["uuid-1"] }
 # Tools
 uuid = { workspace = true, features = ["v4"] }
 {%- endif %}
+{%- if tracing == "yes" %}
+
+# Logging
+tracing = { workspace = true, optional = true }
+{%- endif %}
 
 [features]
 default = []
@@ -33,8 +38,26 @@ ssr = [
 
   # Async runtime
   "dep:tokio",
+
+  {%- if tracing == "yes" %}
+
+  # Logging
+  "dep:tracing"
+  {%- endif %}
 ]
 {%- else %}
 hydrate = ["leptos/hydrate"]
+{%- if tracing == "yes" %}
+ssr = [
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+    "dep:leptos_axum",
+
+    # Logging
+    "dep:tracing"
+]
+{%- else %}
 ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"]
-{%- endif %}
+{%- endif -%}
+{%- endif -%}
