@@ -90,7 +90,7 @@ This template used **lazy loading with code-splitting** by default. Application 
 
 Enable real-time bidirectional communication with optional `Websocket` support
 
-### When Enabled
+#### When Enabled
 
 The template includes:
 
@@ -113,6 +113,17 @@ manager.disconnect();
 ```
 
 The manager automatically handles connection state, message sending, and stream processing in a spawned task
+
+### Tracing (Optional)
+
+Enable structured logging with `tracing` and `tracing-subscriber` for better observability
+
+#### When Enabled
+
+- **Trace module**: Pre-configured `tracing-subscriber` setup with environment-based filtering
+- **Automatic log levels**: `debug` in development, `info` in production for both `server` and `app` crates
+- **Environment override**: Use `RUST_LOG` environment variable to customize filter directives
+- **WebSocket integration**: Replaces `leptos::logging` with `tracing` macros when both features are enabled
 
 ## Styling Options
 
