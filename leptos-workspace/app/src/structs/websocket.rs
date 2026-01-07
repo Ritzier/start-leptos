@@ -21,20 +21,36 @@ pub async fn rkyv_websocket(
             match msg {
                 Ok(request) => match request {
                     Request::Handshake { uuid } => {
+                        {%- if tracing == "yes" %}
+                        tracing::info!("User connected: {uuid}");
+                        {%- else %}
                         leptos::logging::log!("User connected: {uuid}");
+                        {%- endif %}
 
                         if let Err(e) = tx.unbounded_send(Ok(Response::HandshakeResponse)) {
+                            {%- if tracing == "yes" %}
+                            tracing::error!("Failed to send: {e}");
+                            {%- else %}
                             leptos::logging::error!("Failed to send: {e}");
+                            {%- endif %}
                         }
                     }
 
                     Request::Disconnect { uuid } => {
+                        {%- if tracing == "yes" %}
+                        tracing::info!("User disconnect: {uuid}");
+                        {%- else %}
                         leptos::logging::log!("User disconnect: {uuid}");
+                        {%- endif %}
                     }
                 },
 
                 Err(e) => {
+                    {%- if tracing == "yes" %}
+                    tracing::error!("Received error: {e}");
+                    {%- else %}
                     leptos::logging::error!("Received error: {e}");
+                    {%- endif %}
                 }
             }
         }

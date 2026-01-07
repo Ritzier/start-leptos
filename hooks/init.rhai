@@ -23,6 +23,10 @@ if websocket == "no" {
 // ===== Tracing =====
 let tracing = variable::prompt("Tracing?", "no", ["yes", "no"]);
 variable::set("tracing", tracing);
+// Cleanup
+if tracing == "no" {
+    file::delete("server/src/trace.rs");
+}
 
 // ===== Style =====
 let style = variable::prompt("Style?", "default", ["default", "unocss"]);
