@@ -21,7 +21,7 @@ if websocket == "no" {
 }
 
 // ===== Tracing =====
-let tracing = variable::get("Tracing?", "no", ["yes", "no"]);
+let tracing = variable::prompt("Tracing?", "no", ["yes", "no"]);
 variable::set("tracing", tracing);
 
 // ===== Style =====
