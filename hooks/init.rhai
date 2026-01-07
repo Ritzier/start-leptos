@@ -12,6 +12,10 @@ file::rename("leptos-workspace/Cargo.toml", "Cargo.toml");
 // Cleanup
 file::delete("leptos-workspace");
 
+// ===== Websocket =====
+let websocket = variable::prompt("Websocket?", "no", ["yes", "no"]);
+variable::set("websocket", websocket);
+
 // ===== Style =====
 let style = variable::prompt("Style?", "default", ["default", "unocss"]);
 switch style {
