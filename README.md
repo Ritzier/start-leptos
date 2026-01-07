@@ -28,7 +28,6 @@ cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
 
 ````
 ? What is the project name? my-leptos-app
-? Lazy loading(--split)? yes
 ? Style? default
 ? Makefile? yes
 ? Makefile: (Choose with space, confirm with Enter)
@@ -105,7 +104,7 @@ my-leptos-app/
 ## Template Features
 
 - **Workspace architecture**: Modular `app/frontend/server` separation
-- **Lazy loading**: Optional code-splitting with `--split` flag
+- **Lazy loading by default**: Automatically be `code-split` into a separate `WASM` chunk that loads on-demand
 - **Conditional test setup**: Only includes selected test frameworks
 - **Auto-cleanup**: Template removes unused files after generation
 - **Hot reload**: Leptos watch mode with live CSS injection
