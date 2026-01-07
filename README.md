@@ -28,6 +28,7 @@ cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
 
 ````
 ? What is the project name? my-leptos-app
+? Websocket? no
 ? Style? default
 ? Makefile? yes
 ? Makefile: (Choose with space, confirm with Enter)
@@ -61,6 +62,9 @@ my-leptos-app/
 ├── uno.config.ts       # UnoCSS config (if selected)
 ├── package.json        # UnoCSS deps (if selected)
 ├── app/                # Shared app logic
+│   └── src/
+│       ├── pages/      # Lazy-loaded route pages
+│       └── structs/    # WebSocket structs (if enabled
 ├── frontend/           # WASM library
 ├── server/             # Axum SSR server
 ├── style/              # SCSS styles
@@ -74,6 +78,41 @@ my-leptos-app/
     ├── cucumber_test/  # BDD tests (if selected)
     └── playwright/     # E2E tests (if selected)
 ```
+
+## Features
+
+### Lazy Loading (Default)
+
+This template used **lazy loading with code-splitting** by default. Application is automatically split into smaller
+`WASM` chunks that load on-demand.
+
+### Websocket (Optional)
+
+Enable real-time bidirectional communication with optional `Websocket` support
+
+### When Enabled
+
+The template includes:
+
+- `WebsocketManager`: Connection lifecycle management with `StoredValue` and `RwSignal` for efficient cloning
+- `rkyv` **serialization**: Zero-copy binary encoding
+- `Request`/`Response` **enums**: Type-safe message handling with `Archive`, `Deserialize`, `Serialize` traits
+
+Usage Example:
+
+```rust
+// Connect to WebSocket
+let manager = WebSocketManager::new(Uuid::new_v4());
+manager.connect();
+
+// Send messages
+manager.send(Request::CustomMessage { data: "hello" })?;
+
+// Disconnect
+manager.disconnect();
+```
+
+The manager automatically handles connection state, message sending, and stream processing in a spawned task
 
 ## Styling Options
 
@@ -105,6 +144,7 @@ my-leptos-app/
 
 - **Workspace architecture**: Modular `app/frontend/server` separation
 - **Lazy loading by default**: Automatically be `code-split` into a separate `WASM` chunk that loads on-demand
+- **Optional WebSocket**: Real-time communication with `rkyv` encode
 - **Conditional test setup**: Only includes selected test frameworks
 - **Auto-cleanup**: Template removes unused files after generation
 - **Hot reload**: Leptos watch mode with live CSS injection

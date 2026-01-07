@@ -1,4 +1,7 @@
 mod pages;
+{%- if websocket == "yes" %}
+pub mod structs;
+{%- endif %}
 
 mod app;
 pub use app::App;

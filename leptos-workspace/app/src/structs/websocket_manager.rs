@@ -1,0 +1,92 @@
+use futures::StreamExt;
+use futures::channel::mpsc::{self, UnboundedSender};
+use leptos::prelude::*;
+use uuid::Uuid;
+
+use super::{Request, Response, rkyv_websocket};
+
+#[derive(Clone)]
+pub struct WebSocketManager {
+    tx: StoredValue<Option<UnboundedSender<Result<Request, ServerFnError>>>>,
+    pub is_connected: RwSignal<bool>,
+    pub uuid: StoredValue<Uuid>,
+}
+
+impl WebSocketManager {
+    pub fn new(uuid: Uuid) -> Self {
+        Self {
+            tx: StoredValue::new(None),
+            is_connected: RwSignal::new(false),
+            uuid: StoredValue::new(uuid),
+        }
+    }
+
+    /// Establishes WebSocket connection and starts listening for responses
+    pub fn connect(&self) {
+        let (tx, rx) = mpsc::unbounded();
+        let uuid = self.uuid.get_value();
+
+        if let Err(e) = tx.unbounded_send(Ok(Request::Handshake { uuid })) {
+            leptos::logging::error!("Failed to send `Request::HandShake`: {e}");
+            return;
+        }
+
+        self.tx.set_value(Some(tx));
+        self.is_connected.set(true);
+
+        let is_connected = self.is_connected;
+
+        leptos::task::spawn_local(async move {
+            let mut stream = match rkyv_websocket(rx.into()).await {
+                Ok(stream) => stream,
+                Err(e) => {
+                    leptos::logging::error!("Failed to connect websocket: {e}");
+                    is_connected.set(false);
+                    return;
+                }
+            };
+
+            while let Some(response) = stream.next().await {
+                let response = match response {
+                    Ok(response) => response,
+                    Err(e) => {
+                        leptos::logging::log!("Websocket closed: {e}");
+                        is_connected.set(false);
+                        return;
+                    }
+                };
+
+                match response {
+                    Response::HandshakeResponse => {
+                        leptos::logging::log!("Received: Response::HandshakeResponse")
+                    }
+                }
+            }
+
+            is_connected.set(false);
+        });
+    }
+
+    /// Sends a request through the WebSocket connection
+    pub fn send(&self, request: Request) -> Result<(), String> {
+        match self.tx.get_value() {
+            Some(tx) => tx
+                .unbounded_send(Ok(request))
+                .map_err(|e| format!("Failed to send request: {e}")),
+            None => {
+                leptos::logging::error!("`tx` value is None");
+                self.is_connected.set(false);
+                Err("Connection not available".to_string())
+            }
+        }
+    }
+
+    /// Gracefully disconnects the WebSocket
+    pub fn disconnect(&self) {
+        let uuid = self.uuid.get_value();
+        if let Err(e) = self.send(Request::Disconnect { uuid }) {
+            leptos::logging::error!("{e}");
+        }
+        self.is_connected.set(false);
+    }
+}

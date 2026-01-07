@@ -8,8 +8,33 @@ leptos.workspace = true
 leptos_meta.workspace = true
 leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
+{%- if websocket == "yes" %}
+
+# Async runtime
+futures = { workspace = true }
+tokio = { workspace = true, optional = true }
+
+# Codec
+rkyv = { workspace = true, features = ["uuid-1"] }
+
+# Tools
+uuid = { workspace = true, features = ["v4"] }
+{%- endif %}
 
 [features]
 default = []
+{%- if websocket == "yes" %}
+hydrate = ["leptos/hydrate", "uuid/js"]
+ssr = [
+  "leptos/ssr",
+  "leptos_meta/ssr",
+  "leptos_router/ssr",
+  "dep:leptos_axum",
+
+  # Async runtime
+  "dep:tokio",
+]
+{%- else %}
 hydrate = ["leptos/hydrate"]
 ssr = ["leptos/ssr", "leptos_meta/ssr", "leptos_router/ssr", "dep:leptos_axum"]
+{%- endif %}
