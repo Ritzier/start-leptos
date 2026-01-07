@@ -20,6 +20,10 @@ if websocket == "no" {
     file::delete("app/src/structs");
 }
 
+// ===== Tracing =====
+let tracing = variable::get("Tracing?", "no", ["yes", "no"]);
+variable::set("tracing", tracing);
+
 // ===== Style =====
 let style = variable::prompt("Style?", "default", ["default", "unocss"]);
 switch style {
