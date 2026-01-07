@@ -12,10 +12,6 @@ file::rename("leptos-workspace/Cargo.toml", "Cargo.toml");
 // Cleanup
 file::delete("leptos-workspace");
 
-// ===== Lazy Loading(--split) =====
-let lazy = variable::prompt("Lazy Loading(--split)?", "no", ["yes", "no"]); 
-variable::set("lazy", lazy);
-
 // ===== Style =====
 let style = variable::prompt("Style?", "default", ["default", "unocss"]);
 switch style {
