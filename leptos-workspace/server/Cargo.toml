@@ -12,7 +12,12 @@ leptos = { workspace = true }
 
 # Server runtime
 axum = { workspace = true, optional = true }
-tokio = { workspace = true, features = ["rt-multi-thread"], optional = true }
+
+# Async runtime
+tokio = { workspace = true, features = [
+  "rt-multi-thread",
+  "signal",
+], optional = true }
 
 # Better error handling
 thiserror = { workspace = true, optional = true }

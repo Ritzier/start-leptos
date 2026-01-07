@@ -14,4 +14,7 @@ pub enum Error {
         #[source]
         source: std::io::Error,
     },
+
+    #[error("Io: {0}")]
+    Io(#[from] std::io::Error),
 }
