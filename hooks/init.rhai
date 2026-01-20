@@ -43,3 +43,13 @@ switch style {
 variable::set("style", style);
 // Cleanup
 file::delete("styles");
+
+// ===== Docker =====
+let docker = variable::prompt("Docker?", "No", ["Yes", "No"]);
+switch docker {
+    "Yes" => {
+        file::rename("Docker/Dockerfile", "Dockerfile");
+        file::rename("Docker/docker-compose.yml", "docker-compose.yml");
+    }
+}
+file::delete("Docker");
