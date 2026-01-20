@@ -32,7 +32,6 @@ impl WebSocketManager {
         }
 
         self.tx.set_value(Some(tx));
-        self.is_connected.set(true);
 
         let is_connected = self.is_connected;
 
@@ -51,14 +50,14 @@ impl WebSocketManager {
                     Ok(response) => response,
                     Err(e) => {
                         leptos::logging::log!("Websocket closed: {e}");
-                        is_connected.set(false);
                         return;
                     }
                 };
 
                 match response {
                     Response::HandshakeResponse => {
-                        leptos::logging::log!("Received: Response::HandshakeResponse")
+                        is_connected.set(true);
+                        leptos::logging::log!("Received: Response::HandshakeResponse");
                     }
                 }
             }
