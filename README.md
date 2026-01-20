@@ -30,6 +30,7 @@ cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
 ? What is the project name? my-leptos-app
 ? Websocket? no
 ? Style? default
+? Docker? No
 ? Makefile? yes
 ? Makefile: (Choose with space, confirm with Enter)
 [x] Cucumber
@@ -53,30 +54,71 @@ cargo make playwright    # Playwright E2E
 cargo make both
 ````
 
+## Docker Deployment
+
+When `Docker` is enabled during setup
+
+### Build and Run
+
+```bash
+# Build image
+docker compose build
+
+# Run container
+docker compose up -d
+
+# View logs
+docker compose logs -f
+```
+
+### Configuration
+
+The `Docker` setup uses:
+
+- **Multi-stage build**: optimized builder and runtime stages
+- **Debian bookworm-slim**: Better network-performance for Websocket apps
+- **Layer caching**: Seperate dependency and source code layers for faster rebuilds
+- **Non-root user**: Enhanced security with dedicated `appuser`
+- **Health checks**: Automatic service monitoring
+- **Port mapping**: Exposes port `3000` by default
+
+Modify `docker-compose.yml` to customize:
+
+```bash
+services:
+  leptos-app:
+    ports:
+      - "8000:3000"  # Map to different host port
+    environment:
+      - RUST_LOG=debug  # Adjust log level
+```
+
 ## Structure
 
 ```text
 my-leptos-app/
-├── Cargo.toml          # Workspace config
-├── Makefile.toml       # Task runner (optional)
-├── uno.config.ts       # UnoCSS config (if selected)
-├── package.json        # UnoCSS deps (if selected)
-├── app/                # Shared app logic
+├── Cargo.toml              # Workspace config
+├── Dockerfile              # Multi-stage Docker build (if enabled)
+├── docker-compose.yml      # Container orchestration (if enabled)
+├── Makefile.toml           # Task runner (optional)
+├── uno.config.ts           # UnoCSS config (if selected)
+├── package.json            # Node deps (if UnoCSS selected)
+├── app/                    # Shared app logic
 │   └── src/
-│       ├── pages/      # Lazy-loaded route pages
-│       └── structs/    # WebSocket structs (if enabled
-├── frontend/           # WASM library
-├── server/             # Axum SSR server
-├── style/              # SCSS styles
+│       ├── pages/          # Lazy-loaded route pages
+│       └── structs/        # WebSocket structs (if enabled)
+├── frontend/               # WASM library
+├── server/                 # Axum SSR server
+├── style/                  # SCSS styles
 ├── public/
-│ └── uno.css           # Generated UnoCSS (if selected)
-├── makefile/           # Task definitions (optional)
-│ ├── leptos.toml
-│ ├── cucumber.toml     # If Cucumber selected
-│ └── playwright.toml   # If Playwright selected
+│   └── uno.css             # Generated UnoCSS (if selected)
+├── makefile/               # Task definitions (optional)
+│   ├── leptos.toml
+│   ├── cucumber.toml       # If Cucumber selected
+│   └── playwright.toml     # If Playwright selected
 └── tests/
-    ├── cucumber_test/  # BDD tests (if selected)
-    └── playwright/     # E2E tests (if selected)
+    ├── cucumber_test/      # BDD tests (if selected)
+    └── playwright/         # E2E tests (if selected)
 ```
 
 ## Features
