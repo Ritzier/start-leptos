@@ -59,7 +59,7 @@ fn ConnectedComponent(websocket_manager: WebSocketManager) -> impl IntoView {
     view! {
         <button on:click=move |_| {
             websocket_manager.disconnect();
-        }>"Diconnect"</button>
+        }>"Disconnect"</button>
     }
 }
 {%- else -%}
