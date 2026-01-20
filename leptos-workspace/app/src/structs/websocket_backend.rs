@@ -38,7 +38,7 @@ impl WebsocketBackend {
                         {%- if tracing == "yes" %}
                         tracing::info!("User connected: {uuid}");
                         {%- else %}
-                        leptos::logging::log!("User connected: {uuid}");
+                        leptos::logging::info!("User connected: {uuid}");
                         {%- endif %}
                     }
 
@@ -46,7 +46,7 @@ impl WebsocketBackend {
                         {%- if tracing == "yes" %}
                         tracing::info!("User disconnect: {uuid}");
                         {%- else %}
-                        leptos::logging::log!("User disconnect: {uuid}");
+                        leptos::logging::info!("User disconnect: {uuid}");
                         {%- endif %}
                         return false;
                     }
