@@ -40,6 +40,14 @@ impl WebsocketBackend {
                         {%- else %}
                         leptos::logging::info!("User connected: {uuid}");
                         {%- endif %}
+
+                        if let Err(e) = self.tx.unbounded_send(Ok(Response::HandshakeResponse)) {
+                            {%- if tracing == "yes" %}
+                            tracing::info!("Failed send `Response` to client: {e}");
+                            {%- else %}
+                            leptos::logging::info!("Failed send `Response` to client: {e}");
+                            {%- endif %}
+                        }
                     }
 
                     Request::Disconnect { uuid } => {

@@ -8,7 +8,7 @@ install_deps "." "root"
 
 print "$title" "Building and serving Leptos project..."
 
-if cargo leptos build; then
+if cargo leptos build --split; then
     print "$title" "Build completed successfully"
 else
     exit_code=$?
@@ -56,7 +56,7 @@ fi
 print "$title" "Starting Leptos server on $LEPTOS_SITE_ADDR"
 
 # Start Leptos server in background
-cargo leptos serve &
+cargo leptos serve --split &
 cargo_pidd=$!
 
 # Wait for server process to start and get leptos pid
