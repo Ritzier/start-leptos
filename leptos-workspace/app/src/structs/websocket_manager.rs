@@ -49,7 +49,7 @@ impl WebSocketManager {
                 let response = match response {
                     Ok(response) => response,
                     Err(e) => match e.to_string().as_ref() {
-                        "error reaching server to call server function: WebSocket Closed: code: 1005, reason:" =>
+                        "error reaching server to call server function: WebSocket Closed: code: 1005, reason: " =>
                         {
                             leptos::logging::log!("Websocket closed: {e}");
                             is_connected.set(false);
