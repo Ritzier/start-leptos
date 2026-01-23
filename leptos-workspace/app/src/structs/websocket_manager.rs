@@ -48,21 +48,27 @@ impl WebSocketManager {
             while let Some(response) = stream.next().await {
                 let response = match response {
                     Ok(response) => response,
-                    Err(e) => {
-                        leptos::logging::log!("Websocket closed: {e}");
-                        return;
-                    }
+                    Err(e) => match e.to_string().as_ref() {
+                        "error reaching server to call server function: WebSocket Closed: code: 1005, reason:" =>
+                        {
+                            leptos::logging::log!("Websocket closed: {e}");
+                            is_connected.set(false);
+                            return;
+                        }
+                        error => {
+                            leptos::logging::error!("{error}");
+                            continue;
+                        }
+                    },
                 };
 
                 match response {
-                    Response::HandshakeResponse => {
+                    FrontendResponse::HandshakeResponse => {
                         is_connected.set(true);
-                        leptos::logging::log!("Received: Response::HandshakeResponse");
+                        leptos::logging::log!("Received: FrontendResponse::HandshakeResponse");
                     }
                 }
             }
-
-            is_connected.set(false);
         });
     }
 
