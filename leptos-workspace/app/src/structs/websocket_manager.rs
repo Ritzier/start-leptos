@@ -63,7 +63,7 @@ impl WebSocketManager {
                 };
 
                 match response {
-                    FrontendResponse::HandshakeResponse => {
+                    Response::HandshakeResponse => {
                         is_connected.set(true);
                         leptos::logging::log!("Received: FrontendResponse::HandshakeResponse");
                     }
