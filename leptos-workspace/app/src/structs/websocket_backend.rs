@@ -38,14 +38,14 @@ impl WebsocketBackend {
                         {%- if tracing == "yes" %}
                         tracing::info!("User connected: {uuid}");
                         {%- else %}
-                        leptos::logging::info!("User connected: {uuid}");
+                        leptos::logging::log!("User connected: {uuid}");
                         {%- endif %}
 
                         if let Err(e) = self.tx.unbounded_send(Ok(Response::HandshakeResponse)) {
                             {%- if tracing == "yes" %}
                             tracing::info!("Failed send `Response` to client: {e}");
                             {%- else %}
-                            leptos::logging::info!("Failed send `Response` to client: {e}");
+                            leptos::logging::log!("Failed send `Response` to client: {e}");
                             {%- endif %}
                         }
                     }
@@ -54,7 +54,7 @@ impl WebsocketBackend {
                         {%- if tracing == "yes" %}
                         tracing::info!("User disconnect: {uuid}");
                         {%- else %}
-                        leptos::logging::info!("User disconnect: {uuid}");
+                        leptos::logging::log!("User disconnect: {uuid}");
                         {%- endif %}
                         return false;
                     }
@@ -75,7 +75,7 @@ impl WebsocketBackend {
                 {%- if tracing == "yes" %}
                 tracing::info!("Input stream closed");
                 {%- else %}
-                leptos::logging::info!("Input stream closed");
+                leptos::logging::log!("Input stream closed");
                 {%- endif %}
                 false
             }
