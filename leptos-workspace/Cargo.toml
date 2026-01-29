@@ -10,7 +10,7 @@ opt-level = 'z'
 panic = "abort"
 
 [workspace.dependencies]
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 leptos = { version = "0.8", features = ["rkyv"] }
 {%- else %}
 leptos = { version = "0.8" }
@@ -27,7 +27,7 @@ axum = "0.8"
 
 # Async runtime
 tokio = { version = "1" }
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 futures = "0.3"
 {%- endif %}
 
@@ -46,7 +46,7 @@ tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 console_error_panic_hook = "0.1" # Better panic messages in browser console
 {%- endif %}
 
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 
 # Codec
 rkyv = "0.8"

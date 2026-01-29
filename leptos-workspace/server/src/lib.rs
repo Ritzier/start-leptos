@@ -2,7 +2,7 @@
 mod debug;
 mod errors;
 mod server;
-{%- if tracing == "yes" %}
+{%- if tracing == true %}
 mod trace;
 {%- endif %}
 
@@ -10,6 +10,6 @@ mod trace;
 pub use debug::Env;
 pub use errors::Error;
 pub use server::Server;
-{%- if tracing == "yes" %}
+{%- if tracing == true %}
 pub use trace::Trace;
 {%- endif %}

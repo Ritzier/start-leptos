@@ -35,14 +35,14 @@ impl WebsocketBackend {
             Some(Ok(request)) => {
                 match request {
                     Request::Handshake { uuid } => {
-                        {%- if tracing == "yes" %}
+                        {%- if tracing == true %}
                         tracing::info!("User connected: {uuid}");
                         {%- else %}
                         leptos::logging::log!("User connected: {uuid}");
                         {%- endif %}
 
                         if let Err(e) = self.tx.unbounded_send(Ok(Response::HandshakeResponse)) {
-                            {%- if tracing == "yes" %}
+                            {%- if tracing == true %}
                             tracing::info!("Failed send `Response` to client: {e}");
                             {%- else %}
                             leptos::logging::log!("Failed send `Response` to client: {e}");
@@ -51,7 +51,7 @@ impl WebsocketBackend {
                     }
 
                     Request::Disconnect { uuid } => {
-                        {%- if tracing == "yes" %}
+                        {%- if tracing == true %}
                         tracing::info!("User disconnect: {uuid}");
                         {%- else %}
                         leptos::logging::log!("User disconnect: {uuid}");
@@ -63,7 +63,7 @@ impl WebsocketBackend {
             }
 
             Some(Err(e)) => {
-                {%- if tracing == "yes" %}
+                {%- if tracing == true %}
                 tracing::error!("Error receiving message: {e}");
                 {%- else %}
                 leptos::logging::error!("Error receiving message: {e}");
@@ -72,7 +72,7 @@ impl WebsocketBackend {
             }
 
             None => {
-                {%- if tracing == "yes" %}
+                {%- if tracing == true %}
                 tracing::info!("Input stream closed");
                 {%- else %}
                 leptos::logging::log!("Input stream closed");

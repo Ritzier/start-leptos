@@ -8,7 +8,7 @@ leptos.workspace = true
 leptos_meta.workspace = true
 leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 
 # Async runtime
 futures = { workspace = true }
@@ -20,7 +20,7 @@ rkyv = { workspace = true, features = ["uuid-1"] }
 # Tools
 uuid = { workspace = true, features = ["v4"] }
 {%- endif %}
-{%- if tracing == "yes" %}
+{%- if tracing == true %}
 
 # Logging
 tracing = { workspace = true, optional = true }
@@ -28,7 +28,7 @@ tracing = { workspace = true, optional = true }
 
 [features]
 default = []
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 hydrate = ["leptos/hydrate", "uuid/js"]
 ssr = [
   "leptos/ssr",
@@ -39,7 +39,7 @@ ssr = [
   # Async runtime
   "dep:tokio",
 
-  {%- if tracing == "yes" %}
+  {%- if tracing == true %}
 
   # Logging
   "dep:tracing"
@@ -47,7 +47,7 @@ ssr = [
 ]
 {%- else %}
 hydrate = ["leptos/hydrate"]
-{%- if tracing == "yes" %}
+{%- if tracing == true %}
 ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",

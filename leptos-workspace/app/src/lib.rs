@@ -1,5 +1,5 @@
 mod pages;
-{%- if websocket == "yes" %}
+{%- if websocket == true %}
 pub mod structs;
 {%- endif %}
 
