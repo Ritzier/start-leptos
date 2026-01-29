@@ -4,7 +4,7 @@ if websocket == "" {
     let websocket = variable::prompt("Websocket?", false);
 }
 // Cleanup
-if websocket == false {
+if websocket == "false" {
     file::delete("app/src/structs");
 }
 
@@ -14,13 +14,12 @@ if tracing == "" {
     let tracing = variable::prompt("Tracing?", false);
 }
 // Cleanup
-if tracing == false {
+if tracing == "false" {
     file::delete("server/src/trace.rs");
 }
 
 // ===== Style =====
 let style = variable::get("style");
-print(`${style}`);
 if (style != "default" && style != "unocss") {
     let style = variable::prompt("Style?", "default", ["default", "unocss"]);
 }
@@ -40,7 +39,7 @@ if docker == "" {
     let docker = variable::prompt("Docker?", false);
 }
 // Move these file out
-if docker == true {
+if docker == "true" {
     file::rename("Docker/Dockerfile", "Dockerfile");
     file::rename("Docker/docker-compose.yml", "docker-compose.yml");
 }
@@ -58,14 +57,14 @@ if playwright == "" {
     let playwright = variable::prompt("Playwright?", false);
 }
 
-if (cucumber == false && playwright == false) {
+if (cucumber == "false" && playwright == "false") {
     file::delete("tests");
 } else {
     // Selective delete if one/both false
-    if cucumber == false {
+    if cucumber == "false" {
         file::delete("tests/cucumber_test");
     }
-    if playwright == false {
+    if playwright == "false" {
         file::delete("tests/playwright");
     }
 }

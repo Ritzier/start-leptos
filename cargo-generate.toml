@@ -1,21 +1,8 @@
 [template]
 cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
-ignore = ["README.md", "TODO.md", "template-test"]
-
-# [placeholders]
-# ask_makefile = { prompt = "Makefile?", type = "bool", default = false }
-#
-# [conditional.'ask_makefile'.placeholders]
-# cucumber = { prompt = "Cucumber?", type = "bool", default = false }
-# playwright = { prompt = "Playwright?", type = "bool", default = false }
-#
-# [hooks]
-# # init = ["hooks/init.rhai"]
-# pre = ["hooks/init.rhai"]
-# post = ["hooks/post.rhai"]
+ignore = ["README.md", "TODO.md", "template-test", "hooks"]
 
 [hooks]
 init = ["hooks/initialize.rhai"]
 pre = ["hooks/variable.rhai"]
-# pre = ["hooks/init.rhai"]
