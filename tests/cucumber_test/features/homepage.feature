@@ -6,7 +6,7 @@ Feature: Homepage UI
     Given I am on the homepage
     Then I see a button with "Connect"
     When I click the button labeled "Connect"
-    Then I should see console log containing "Received: Response::HandshakeResponse"
+    Then I should see console log containing "Received: FrontendResponse::HandshakeResponse"
     Then the button label changes to "Disconnect"
     Then I see a button with "Disconnect"
     When I click the button labeled "Disconnect"
