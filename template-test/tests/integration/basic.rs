@@ -1,35 +1,116 @@
 use anyhow::Result;
-use insta::assert_json_snapshot;
 
 use crate::{CargoGenerate, Style};
 
-// tokio::fs::write("1.json", serde_json::to_string_pretty(&files).unwrap()).await?;
-
-#[tokio::test]
-async fn a() -> Result<()> {
-    let generate_result = CargoGenerate::default().build().await?;
-    let files = generate_result.to_snapshot().await?;
-    let files_json = serde_json::to_string_pretty(&files)?;
-    assert_json_snapshot!("default_template", files_json);
-
-    generate_result.check_clippy().await?;
-
-    Ok(())
+macro_rules! template_test {
+    ($name:ident, $config:expr) => {
+        #[tokio::test]
+        async fn $name() -> Result<()> {
+            $config
+                .build()
+                .await?
+                .tests(concat!(stringify!($name), "_template"))
+                .await
+        }
+    };
 }
 
-#[tokio::test]
-async fn b() -> Result<()> {
-    let cargo_generate = CargoGenerate {
+template_test!(default_template, CargoGenerate::default());
+
+template_test!(
+    all_feature_template,
+    CargoGenerate {
+        websocket: true,
+        tracing: true,
+        style: Style::Unocss,
+        docker: true,
+        cucumber: true,
+        playwright: true
+    }
+);
+
+template_test!(
+    websocket_only,
+    CargoGenerate {
+        websocket: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    tracing_only,
+    CargoGenerate {
+        tracing: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    style_unocss_only,
+    CargoGenerate {
         style: Style::Unocss,
         ..Default::default()
-    };
-    let generate_result = cargo_generate.build().await?;
-    let files = generate_result.to_snapshot().await?;
-    let files_json = serde_json::to_string_pretty(&files)?;
+    }
+);
 
-    assert_json_snapshot!("unocss_template", files_json);
+template_test!(
+    docker_only,
+    CargoGenerate {
+        docker: true,
+        ..Default::default()
+    }
+);
 
-    generate_result.check_clippy().await?;
+template_test!(
+    cucumber_only,
+    CargoGenerate {
+        cucumber: true,
+        ..Default::default()
+    }
+);
 
-    Ok(())
-}
+template_test!(
+    playwright_only,
+    CargoGenerate {
+        playwright: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    cucumber_and_playwright_only,
+    CargoGenerate {
+        playwright: true,
+        cucumber: true,
+        ..Default::default()
+    }
+);
+
+// Websocket with test
+template_test!(
+    websocket_and_cucumber_only,
+    CargoGenerate {
+        websocket: true,
+        playwright: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    websocket_and_playwright_only,
+    CargoGenerate {
+        websocket: true,
+        cucumber: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    websocket_and_cucumber_and_playwright_only,
+    CargoGenerate {
+        websocket: true,
+        playwright: true,
+        cucumber: true,
+        ..Default::default()
+    }
+);
