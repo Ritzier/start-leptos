@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use tempfile::TempDir;
 use tokio::fs;
+use tokio::process::Command;
 use walkdir::{DirEntry, WalkDir};
 
 use super::NAME;
@@ -69,6 +70,33 @@ impl GenerateResult {
             map.insert(key, value);
         }
         Ok(map)
+    }
+
+    /// Run `clippy` on the generated template, check errors, warnings, suggestions
+    pub async fn check_clippy(&self) -> Result<()> {
+        let proj_dir = self.get_path();
+
+        let output = Command::new("cargo")
+            .current_dir(&proj_dir)
+            .arg("clippy")
+            .arg("--")
+            .arg("-D")
+            .arg("warnings")
+            .output()
+            .await
+            .context("`cargo clippy` failed")?;
+
+        anyhow::ensure!(
+            output.status.success(),
+            anyhow::anyhow!(
+                "`cargo clippy` failed with status {:?}\nStdout: {}\nStderr: {}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            )
+        );
+
+        Ok(())
     }
 }
 

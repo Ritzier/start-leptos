@@ -10,8 +10,9 @@ async fn a() -> Result<()> {
     let generate_result = CargoGenerate::default().build().await?;
     let files = generate_result.to_snapshot().await?;
     let files_json = serde_json::to_string_pretty(&files)?;
-
     assert_json_snapshot!("default_template", files_json);
+
+    generate_result.check_clippy().await?;
 
     Ok(())
 }
@@ -27,6 +28,8 @@ async fn b() -> Result<()> {
     let files_json = serde_json::to_string_pretty(&files)?;
 
     assert_json_snapshot!("unocss_template", files_json);
+
+    generate_result.check_clippy().await?;
 
     Ok(())
 }
