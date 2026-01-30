@@ -1,17 +1,19 @@
 [template]
 cargo_generate_version = ">=0.20.0"
 exclude = ["**/favicon.ico"]
-ignore = ["README.md", "TODO.md"]
+ignore = ["README.md", "TODO.md", "template-test", "hooks"]
 
 [placeholders]
-ask_makefile = { prompt = "Makefile?", type = "bool", default = false }
-
-[conditional.'ask_makefile'.placeholders]
-makefile = { prompt = "Makefile", type = "array", choices = [
-  "Cucumber",
-  "Playwright",
+websocket = { prompt = "Websocket?", default = false, type = "bool" }
+tracing = { prompt = "Tracing?", default = false, type = "bool" }
+style = { prompt = "Which style?", default = "default", type = "string", choices = [
+  "default",
+  "unocss",
 ] }
+docker = { prompt = "Docker?", default = false, type = "bool" }
+cucumber = { prompt = "Cucumber?", default = false, type = "bool" }
+playwright = { prompt = "Playwright?", default = false, type = "bool" }
 
 [hooks]
-init = ["hooks/init.rhai"]
-post = ["hooks/post.rhai"]
+init = ["hooks/initialize.rhai"]
+pre = ["hooks/variable.rhai"]

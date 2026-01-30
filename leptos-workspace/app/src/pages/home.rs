@@ -1,4 +1,4 @@
-{%- if websocket == "yes" %}use leptos::either::Either;
+{%- if websocket == true %}use leptos::either::Either;
 use leptos::prelude::*;
 use leptos_router::{LazyRoute, lazy_route};
 use uuid::Uuid;

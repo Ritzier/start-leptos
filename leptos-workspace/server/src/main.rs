@@ -4,7 +4,7 @@ async fn main() -> Result<(), server::Error> {
     use server::*;
     use tokio::signal::unix::{SignalKind, signal};
 
-    {% if tracing == "yes" -%}
+    {% if tracing == true -%}
     Trace::setup();
 
     {% endif -%}
@@ -16,7 +16,7 @@ async fn main() -> Result<(), server::Error> {
 
     tokio::select! {
         result = Server::setup() => {
-            {%- if tracing == "yes" %}
+            {%- if tracing == true %}
             tracing::error!("Server: {result:#?}");
             {%- else %}
             leptos::logging::error!("Server: {result:#?}");
@@ -24,7 +24,7 @@ async fn main() -> Result<(), server::Error> {
         }
 
         _ = sigint.recv() => {
-            {%- if tracing == "yes" %}
+            {%- if tracing == true %}
             tracing::info!("Received SIGTINT");
             {%- else %}
             leptos::logging::log!("Received SIGTINT");
@@ -32,7 +32,7 @@ async fn main() -> Result<(), server::Error> {
         }
 
         _ = sigterm.recv() => {
-            {%- if tracing == "yes" %}
+            {%- if tracing == true %}
             tracing::info!("Received SIGTERM");
             {%- else %}
             leptos::logging::log!("Received SIGTERM");

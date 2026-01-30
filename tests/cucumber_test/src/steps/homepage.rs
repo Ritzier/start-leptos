@@ -1,4 +1,4 @@
-{% if websocket == "yes" -%}
+{% if websocket == true -%}
 use crate::{AppWorld, Result};
 use cucumber::{given, then, when};
 use fantoccini::Locator;
