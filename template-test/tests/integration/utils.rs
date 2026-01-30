@@ -1,3 +1,5 @@
+const NAME: &str = "project-template";
+
 use std::fmt::Display;
 use std::path::Path;
 
@@ -6,18 +8,21 @@ use tempfile::TempDir;
 use tokio::fs;
 use tokio::process::Command;
 
+mod generate_result;
+pub use generate_result::GenerateResult;
+
 #[derive(Debug, Default)]
 pub struct CargoGenerate {
-    websocket: bool,
-    tracing: bool,
-    style: Style,
-    docker: bool,
-    cucumber: bool,
-    playwright: bool,
+    pub websocket: bool,
+    pub tracing: bool,
+    pub style: Style,
+    pub docker: bool,
+    pub cucumber: bool,
+    pub playwright: bool,
 }
 
 #[derive(Debug, Default)]
-enum Style {
+pub enum Style {
     #[default]
     Default,
     Unocss,
@@ -35,7 +40,7 @@ impl Display for Style {
 }
 
 impl CargoGenerate {
-    pub async fn build(self) -> Result<TempDir> {
+    pub async fn build(self) -> Result<GenerateResult> {
         let Self {
             websocket,
             tracing,
@@ -57,7 +62,7 @@ impl CargoGenerate {
             .arg("--path")
             .arg(template_dir.display().to_string())
             .arg("--name")
-            .arg("test-proj")
+            .arg(NAME)
             .arg("--destination")
             .arg(output_dir.display().to_string())
             .arg("-d")
@@ -99,12 +104,13 @@ impl CargoGenerate {
         );
 
         // Verify generated project dir exists
-        let proj_dir = output_dir.join("test-proj");
+        let proj_dir = output_dir.join(NAME);
         let proj_meta = fs::metadata(&proj_dir)
             .await
             .context("test-proj dir missing")?;
         anyhow::ensure!(proj_meta.is_dir(), "test-proj is not a directory");
 
-        Ok(tempfile)
+        // Generate Result
+        GenerateResult::new(tempfile)
     }
 }

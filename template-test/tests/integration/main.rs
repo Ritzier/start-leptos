@@ -1,4 +1,4 @@
 mod basic;
 mod utils;
 
-use utils::CargoGenerate;
+use utils::{CargoGenerate, Style};
