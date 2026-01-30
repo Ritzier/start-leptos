@@ -17,24 +17,17 @@ cargo install cargo-leptos cargo-generate cargo-make
 Create Project
 
 ```bash
-# Method 1: cargo-generate (interactive)
-cargo generate --git https://github.com/ritzier/start-leptos-workspace
-
-# Method 2: cargo-leptos
-cargo leptos new --git https://github.com/ritzier/start-leptos-workspace my-app
+cargo generate ritzier/start-leptos
 ```
 
 ### Interacitve Prompts
 
-````
-? What is the project name? my-leptos-app
-? Websocket? no
-? Style? default
-? Docker? No
-? Makefile? yes
-? Makefile: (Choose with space, confirm with Enter)
-[x] Cucumber
-[ ] Playwright```
+- **Websocket?** (default: false)
+- **Tracing?** (default: false)
+- **Style?**: Choices: `default`, `unocss` (default: `default`)
+- **Docker?** (default: false)
+- **Cucumber?** (default: false)
+- **Playwright?** (default: false)
 
 ### Commands
 
@@ -44,15 +37,7 @@ cargo leptos watch
 
 # Build production
 cargo leptos build --release
-
-# Run tests
-cargo make chrome        # Cucumber Chrome
-cargo make firefox       # Cucumber Firefox
-cargo make playwright    # Playwright E2E
-
-# Full test suite
-cargo make both
-````
+```
 
 ## Docker Deployment
 
@@ -98,27 +83,22 @@ services:
 ```text
 my-leptos-app/
 ├── Cargo.toml              # Workspace config
-├── Dockerfile              # Multi-stage Docker build (if enabled)
-├── docker-compose.yml      # Container orchestration (if enabled)
-├── Makefile.toml           # Task runner (optional)
-├── uno.config.ts           # UnoCSS config (if selected)
-├── package.json            # Node deps (if UnoCSS selected)
+├── Dockerfile              # Multi-stage Docker build (if `Docker` enabled)
+├── docker-compose.yml      # Container orchestration (if `Docker` enabled)
+├── uno.config.ts           # UnoCSS config (if `Unocss` selected)
+├── package.json            # Node deps (if `UnoCSS` selected)
 ├── app/                    # Shared app logic
 │   └── src/
 │       ├── pages/          # Lazy-loaded route pages
-│       └── structs/        # WebSocket structs (if enabled)
+│       └── structs/        # WebSocket structs (if `Websocket` enabled)
 ├── frontend/               # WASM library
 ├── server/                 # Axum SSR server
 ├── style/                  # SCSS styles
 ├── public/
-│   └── uno.css             # Generated UnoCSS (if selected)
-├── makefile/               # Task definitions (optional)
-│   ├── leptos.toml
-│   ├── cucumber.toml       # If Cucumber selected
-│   └── playwright.toml     # If Playwright selected
+│   └── uno.css             # Generated UnoCSS (if `Unocss` selected)
 └── tests/
-    ├── cucumber_test/      # BDD tests (if selected)
-    └── playwright/         # E2E tests (if selected)
+    ├── cucumber_test/      # BDD tests (if `Cucumber` selected)
+    └── playwright/         # E2E tests (if `Playwright` selected)
 ```
 
 ## Features
@@ -179,14 +159,14 @@ Enable structured logging with `tracing` and `tracing-subscriber` for better obs
 
 ## Testing Frameworks
 
-### Cucumber (BDD)
+### Cucumber (BDD) (Outdated)
 
 - WebDriver-based browser automation with `Fantoccini`
 - Supports Chrome (`chromedriver`) and Firefox (`geckodriver`)
 - Feature files in `tests/cucumber_test/features/`
 - Run: `cargo make chrome` or `cargo make both`
 
-### Playwright
+### Playwright (Outdated)
 
 - Modern E2E testing with Node.js runtime
 - Cross-browser support (Chromium/Firefox/WebKit)
