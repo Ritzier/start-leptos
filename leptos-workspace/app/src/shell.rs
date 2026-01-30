@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_meta::{HashedStylesheet, Link, MetaTags, Stylesheet};
+use leptos_meta::{Link, MetaTags, Stylesheet};
 
 use crate::app::App;
 
