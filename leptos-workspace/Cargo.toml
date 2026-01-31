@@ -76,8 +76,6 @@ end2end-cmd = "npx playwright test"
 end2end-dir = "end2end"
 
 browserquery = "defaults"
-env = "DEV"
-watch = false
 
 bin-features = ["ssr"]
 bin-default-features = false
