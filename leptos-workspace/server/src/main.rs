@@ -1,8 +1,10 @@
 #[cfg(feature = "ssr")]
 #[tokio::main]
-async fn main() -> Result<(), server::Error> {
+async fn main() -> Result<(), color_eyre::Report> {
     use server::*;
     use tokio::signal::unix::{SignalKind, signal};
+
+    color_eyre::install()?;
 
     {% if tracing == true -%}
     Trace::setup();
@@ -11,17 +13,16 @@ async fn main() -> Result<(), server::Error> {
     #[cfg(debug_assertions)]
     Env::setup().await;
 
-    let mut sigint = signal(SignalKind::interrupt())?;
-    let mut sigterm = signal(SignalKind::terminate())?;
+    let mut sigint = signal(SignalKind::interrupt()).map_err(color_eyre::Report::from)?;
+    let mut sigterm = signal(SignalKind::terminate()).map_err(color_eyre::Report::from)?;
 
     tokio::select! {
         result = Server::setup() => {
-            {%- if tracing == true %}
-            tracing::error!("Server: {result:#?}");
-            {%- else %}
-            leptos::logging::error!("Server: {result:#?}");
-            {%- endif %}
+             if let Err(err) = result {
+                Err::<(), _>(color_eyre::Report::from(err))?;
+            }
         }
+
 
         _ = sigint.recv() => {
             {%- if tracing == true %}

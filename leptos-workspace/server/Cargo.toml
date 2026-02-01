@@ -20,6 +20,7 @@ tokio = { workspace = true, features = [
 ], optional = true }
 
 # Better error handling
+color-eyre = { workspace = true, optional = true }
 thiserror = { workspace = true, optional = true }
 {%- if tracing == true %}
 
@@ -43,6 +44,7 @@ ssr = [
   "dep:tokio",
 
   # Better error handling
+  "dep:color-eyre",
   "dep:thiserror",
   {%- if tracing == true %}
 
