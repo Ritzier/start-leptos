@@ -1,0 +1,60 @@
+[workspace]
+resolver = "2"
+members = ["app", "frontend", "tests/cucumber_test", "server"]
+
+[profile.wasm-release]
+inherits = "release"
+codegen-units = 1
+lto = true
+opt-level = 'z'
+panic = "abort"
+
+[workspace.dependencies]
+leptos = { version = "0.8" }
+leptos_meta = { version = "0.8" }
+leptos_router = { version = "0.8" }
+leptos_axum = { version = "0.8" }
+
+# WASM
+wasm-bindgen = "0.2"
+
+# Server runtime
+axum = "0.8"
+
+# Async runtime
+tokio = { version = "1" }
+
+# Better error handling
+color-eyre = "0.6"
+thiserror = "2"
+
+# Logging
+console_error_panic_hook = "0.1" # Better panic messages in browser console
+
+[[workspace.metadata.leptos]]
+name = "fuck"
+output-name = "fuck"
+
+bin-package = "server"
+lib-package = "frontend"
+
+style-file = "style/main.scss"
+# tailwind-input-file = "style/tailwind.css"
+
+site-root = "target/site"
+site-pkg-dir = "pkg"
+assets-dir = "public"
+
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
+
+end2end-cmd = "npx playwright test"
+end2end-dir = "end2end"
+
+browserquery = "defaults"
+
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false
+lib-profile-release = "wasm-release"
