@@ -29,10 +29,18 @@ impl GenerateResult {
 
     /// Runs complete integration test suite on generated template
     ///
-    /// 1. **Snapshot test**: Verifies exact file structure/content via `insta`
-    /// 2. **Clippy linting**: Ensures clean code quality
+    /// **Validation steps (in order):**
+    /// 1. **`cargo check --workspace --features ssr hydrate`**: Type checking
+    /// 2. **`cargo clippy -D warnings`**: Lint all warnings as errors  
+    /// 3. **`insta` JSON snapshot**: Exact file structure/content verification
+    ///
+    /// # Arguments
+    /// * `snapshot` - Snapshot name for `insta` (e.g., `"my_template"`)
     pub async fn tests(&self, snapshot: &str) -> Result<()> {
         let proj_dir = self.get_path();
+
+        // Cargo check
+        self.cargo_check(&proj_dir).await?;
 
         // Clippy
         self.check_clippy(&proj_dir).await?;
@@ -106,6 +114,33 @@ impl GenerateResult {
             map.insert(key, value);
         }
         Ok(map)
+    }
+
+    /// Run `cargo check --workspace --features ssr --features hydrate`
+    async fn cargo_check(&self, proj_dir: &PathBuf) -> Result<()> {
+        let output = Command::new("cargo")
+            .current_dir(proj_dir)
+            .arg("check")
+            .arg("--workspace")
+            .arg("--features")
+            .arg("ssr")
+            .arg("--features")
+            .arg("hydrate")
+            .output()
+            .await
+            .context("`cargo check --features ssr --features hydrate` failed")?;
+
+        anyhow::ensure!(
+            output.status.success(),
+            anyhow::anyhow!(
+                "`cargo check --features ssr --features hydrate` failed with status {:?}\nStdout: {}\nStderr: {}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            )
+        );
+
+        Ok(())
     }
 
     /// Run `cargo clippy` on the generated template project
