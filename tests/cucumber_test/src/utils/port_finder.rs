@@ -1,4 +1,3 @@
-use color_eyre::Result;
 use tokio::net::TcpListener;
 
 use std::sync::atomic::{AtomicU16, Ordering};
@@ -8,7 +7,7 @@ static PORT_COUNTER: AtomicU16 = AtomicU16::new(8000);
 pub struct PortFinder;
 
 impl PortFinder {
-    pub async fn get_available_port() -> Result<u16> {
+    pub async fn get_available_port() -> Result<u16, String> {
         for _ in 0..1000 {
             let port = PORT_COUNTER.fetch_add(1, Ordering::SeqCst);
 
@@ -23,8 +22,6 @@ impl PortFinder {
             }
         }
 
-        Err(color_eyre::eyre::eyre!(
-            "Could not find available port in range 8000-8999 after 1000 attempts"
-        ))
+        Err("Could not find available port in range 8000-8999 after 1000 attempts".to_string())
     }
 }

@@ -36,13 +36,12 @@ impl Server {
     }
 
     #[cfg(feature = "cucumber")]
-    pub async fn cucumber_setup(port: u16, cargo_toml_path: Option<&str>) -> Result<(), Error> {
+    pub async fn cucumber_setup(
+        addr: std::net::SocketAddr,
+        cargo_toml_path: Option<&str>,
+    ) -> Result<(), Error> {
         let conf = get_configuration(cargo_toml_path)?;
-        // let addr = conf.leptos_options.site_addr;
-        let addr = std::net::SocketAddr::new(
-            std::net::IpAddr::V4(std::net::Ipv4Addr::new(127, 0, 0, 1)),
-            port,
-        );
+
         let leptos_options = conf.leptos_options;
         let routes = generate_route_list(App);
 
