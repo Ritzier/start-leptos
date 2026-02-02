@@ -13,7 +13,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
                 <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico" />
-                <Stylesheet id="leptos" href="/pkg/fuck.css" />
+                <Stylesheet id="leptos" href="/pkg/project.css" />
                 <MetaTags />
             </head>
             <body>

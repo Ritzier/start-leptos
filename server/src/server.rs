@@ -11,7 +11,7 @@ pub struct Server;
 
 impl Server {
     pub async fn setup() -> Result<(), Error> {
-        let conf = get_configuration(None)?;
+        let conf = get_configuration(Some("Cargo.toml"))?;
         let addr = conf.leptos_options.site_addr;
         let leptos_options = conf.leptos_options;
         let routes = generate_route_list(App);
