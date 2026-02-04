@@ -26,6 +26,8 @@ impl Server {
             .await
             .map_err(|e| Error::AdressUsed { addr, source: e })?;
 
+        {% if tracing == true %}tracing::info!("Listening on: {addr:#?}");{% else %}println!("Listening on: {addr:#?}");{% endif %}
+
         axum::serve(listener, app.into_make_service())
             .await
             .map_err(|e| Error::AdressUsed { addr, source: e })?;
@@ -77,7 +79,7 @@ impl Server {
             .await
             .map_err(|e| Error::AdressUsed { addr, source: e })?;
 
-        println!("Listening: {addr:?}");
+        tracing::info!("Listening: {addr:?}");
 
         // Signal that server is ready
         let _ = sender.send(());

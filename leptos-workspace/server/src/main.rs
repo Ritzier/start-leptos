@@ -23,7 +23,6 @@ async fn main() -> Result<(), color_eyre::Report> {
             }
         }
 
-
         _ = sigint.recv() => {
             {%- if tracing == true %}
             tracing::info!("Received SIGTINT");
