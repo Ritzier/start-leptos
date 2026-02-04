@@ -18,7 +18,6 @@ pub struct CargoGenerate {
     pub style: Style,
     pub docker: bool,
     pub cucumber: bool,
-    pub playwright: bool,
 }
 
 #[derive(Debug, Default)]
@@ -47,7 +46,6 @@ impl CargoGenerate {
             style,
             docker,
             cucumber,
-            playwright,
         } = self;
 
         let tempfile = TempDir::new()?;
@@ -77,12 +75,7 @@ impl CargoGenerate {
             .arg("-d")
             .arg(format!("docker={}", docker.to_string().to_lowercase()))
             .arg("-d")
-            .arg(format!("cucumber={}", cucumber.to_string().to_lowercase()))
-            .arg("-d")
-            .arg(format!(
-                "playwright={}",
-                playwright.to_string().to_lowercase()
-            ));
+            .arg(format!("cucumber={}", cucumber.to_string().to_lowercase()));
 
         unsafe {
             cmd.pre_exec(move || {

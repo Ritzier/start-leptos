@@ -25,7 +25,6 @@ template_test!(
         style: Style::Unocss,
         docker: true,
         cucumber: true,
-        playwright: true
     }
 );
 
@@ -69,48 +68,11 @@ template_test!(
     }
 );
 
-template_test!(
-    playwright_only,
-    CargoGenerate {
-        playwright: true,
-        ..Default::default()
-    }
-);
-
-template_test!(
-    cucumber_and_playwright_only,
-    CargoGenerate {
-        playwright: true,
-        cucumber: true,
-        ..Default::default()
-    }
-);
-
 // Websocket with test
 template_test!(
     websocket_and_cucumber_only,
     CargoGenerate {
         websocket: true,
-        playwright: true,
-        ..Default::default()
-    }
-);
-
-template_test!(
-    websocket_and_playwright_only,
-    CargoGenerate {
-        websocket: true,
-        cucumber: true,
-        ..Default::default()
-    }
-);
-
-template_test!(
-    websocket_and_cucumber_and_playwright_only,
-    CargoGenerate {
-        websocket: true,
-        playwright: true,
-        cucumber: true,
         ..Default::default()
     }
 );

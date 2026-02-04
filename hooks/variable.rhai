@@ -33,18 +33,9 @@ if docker == true {
 // Cleanup
 file::delete("Docker");
 
-// ====== Cucumber && Playwright =====
+// ====== Cucumber =====
 let cucumber = variable::get("cucumber");
-let playwright = variable::get("playwright");
 
-if (cucumber == false && playwright == false) {
+if (cucumber == false) {
     file::delete("tests");
-} else {
-    // Selective delete if one/both false
-    if cucumber == false {
-        file::delete("tests/cucumber_test");
-    }
-    if playwright == false {
-        file::delete("tests/playwright");
-    }
 }

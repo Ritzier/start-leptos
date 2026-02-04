@@ -35,16 +35,14 @@ futures = "0.3"
 color-eyre = "0.6"
 thiserror = "2"
 
-{%- if tracing == true %}
-
 # Logging
-console_error_panic_hook = "0.1"                                       # Better panic messages in browser console
+console_error_panic_hook = "0.1.7"
+
+{%- if tracing == true or cucumber == true %}
 tracing = "0.1.44"
+{%- endif %}
+{%- if tracing == true %}
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
-{%- else %}
-
-# Logging
-console_error_panic_hook = "0.1" # Better panic messages in browser console
 {%- endif %}
 
 {%- if websocket == true %}
@@ -72,9 +70,6 @@ assets-dir = "public"
 
 site-addr = "127.0.0.1:3000"
 reload-port = 3001
-
-end2end-cmd = "npx playwright test"
-end2end-dir = "end2end"
 
 browserquery = "defaults"
 
