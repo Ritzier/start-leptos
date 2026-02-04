@@ -1,25 +1,14 @@
-type Result<T> = std::result::Result<T, anyhow::Error>;
-
-mod app_world;
-mod env;
-mod steps;
-use std::ffi::OsStr;
-use std::fs;
-
-use app_world::AppWorld;
-use cucumber::World;
+use cucumber_test::{LeptosServer, Trace, cucumber_test};
 
 #[tokio::main]
-async fn main() -> Result<()> {
-    for entry in fs::read_dir("tests/cucumber_test/features")? {
-        let path = entry?.path();
-        if path.extension() == Some(OsStr::new("feature")) {
-            AppWorld::cucumber()
-                .fail_on_skipped()
-                .run_and_exit(path)
-                .await;
-        }
-    }
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    color_eyre::install()?;
+
+    Trace::setup();
+
+    LeptosServer::serve_and_wait(5).await?;
+
+    cucumber_test("tests/cucumber_test/features").await?;
 
     Ok(())
 }

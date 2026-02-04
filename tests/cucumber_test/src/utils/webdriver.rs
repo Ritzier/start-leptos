@@ -1,58 +1,48 @@
-use std::process::{Child, Command, Stdio};
-use std::sync::atomic::{AtomicU16, Ordering};
+use std::env;
+use std::process::Stdio;
 
-use cucumber::World;
+use anyhow::{Result, anyhow};
 use fantoccini::wd::Capabilities;
 use fantoccini::{Client, ClientBuilder};
 use serde_json::json;
+use tokio::process::{Child, Command};
 
-use crate::{Result, env::Dotenv};
+use crate::PortFinder;
 
-static PORT: AtomicU16 = AtomicU16::new(3311);
-
-#[derive(Debug, World)]
-#[world(init = Self::new)]
-pub struct AppWorld {
-    pub client: Option<Client>,
-    pub leptos_site_addr: String,
+#[derive(Debug)]
+pub struct Webdriver {
+    pub client: Client,
+    #[expect(dead_code)]
     child: Child,
 }
 
-impl AppWorld {
-    async fn new() -> Result<Self> {
-        let Dotenv {
-            webdriver,
-            leptos_site_addr,
-        } = Dotenv::new()?;
-
-        let (client, child) = match webdriver.as_ref() {
-            "geckodriver" => build_geckodriver().await?,
-            "chromedriver" => build_chromedriver().await?,
-            unknown_webdriver => {
-                return Err(anyhow::Error::msg(format!(
-                    "Unknown webdriver: {unknown_webdriver}"
-                )));
-            }
+impl Webdriver {
+    pub async fn new() -> Result<Self> {
+        let (client, child) = match env::var("WEBDRIVER") {
+            Err(_) => build_chromedriver().await?,
+            Ok(webdriver_env) => match webdriver_env.to_lowercase().as_str() {
+                "chromedriver" | "chrome" => build_chromedriver().await?,
+                "geckodriver" | "gecko" => build_geckodriver().await?,
+                invalid => return Err(anyhow!("Invalid WEBDRIVER value: `{invalid}`")),
+            },
         };
 
-        let leptos_site_addr = format!("http://{leptos_site_addr}");
-
-        Ok(Self {
-            client: Some(client),
-            leptos_site_addr,
-            child,
-        })
+        Ok(Self { client, child })
     }
 }
 
 async fn build_chromedriver() -> Result<(Client, Child)> {
-    let port = PORT.load(Ordering::Relaxed);
+    let port = PortFinder::get_available_port()
+        .await
+        .map_err(|e| anyhow!("{e}"))?;
 
     let child = Command::new("chromedriver")
         .arg(format!("--port={port}"))
         .stdout(Stdio::null()) // silence output
         .stderr(Stdio::null())
         .spawn()?;
+
+    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
     let cap: Capabilities = serde_json::from_str(
         r#"{"browserName":"chrome","goog:chromeOptions":{"args":["--headless"]}}"#,
@@ -67,7 +57,9 @@ async fn build_chromedriver() -> Result<(Client, Child)> {
 }
 
 async fn build_geckodriver() -> Result<(Client, Child)> {
-    let port = PORT.fetch_add(1, Ordering::SeqCst);
+    let port = PortFinder::get_available_port()
+        .await
+        .map_err(|e| anyhow!("{e}"))?;
 
     let child = Command::new("geckodriver")
         .arg(format!("--port={port}"))
@@ -88,11 +80,4 @@ async fn build_geckodriver() -> Result<(Client, Child)> {
         .await?;
 
     Ok((client, child))
-}
-
-impl Drop for AppWorld {
-    fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
-    }
 }

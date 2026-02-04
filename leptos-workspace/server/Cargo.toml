@@ -53,3 +53,6 @@ ssr = [
   "dep:tracing-subscriber",
   {%- endif %}
 ]
+{%- if cucumber == true %}
+cucumber = []
+{%- endif %}
