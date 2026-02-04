@@ -37,6 +37,7 @@ impl Server {
     pub async fn cucumber_setup(
         addr: std::net::SocketAddr,
         cargo_toml_path: Option<&str>,
+        sender: tokio::sync::oneshot::Sender<()>,
     ) -> Result<(), Error> {
         let conf = get_configuration(cargo_toml_path)?;
 
@@ -46,14 +47,27 @@ impl Server {
         let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
             .nth(1)
-            .unwrap();
+            .ok_or_else(|| {
+                Error::Io(std::io::Error::new(
+                    std::io::ErrorKind::NotFound,
+                    "Failed to find parent directory of `CARGO_MANIFEST_DIR`",
+                ))
+            })?;
 
+        // Create symlink for WASM file compatibility
         let pkg = manifest_dir.join("target").join("site").join("pkg");
-        tokio::fs::symlink(
-            pkg.join(format!("{}.wasm", leptos_options.output_name)),
-            pkg.join(format!("{}_bg.wasm", leptos_options.output_name)),
-        )
-        .await?;
+        let wasm_file = pkg.join(format!("{}.wasm", leptos_options.output_name));
+        let bg_wasm_file = pkg.join(format!("{}_bg.wasm", leptos_options.output_name));
+
+        // Create symlink only if _bg.wasm doesn't exist
+        if !bg_wasm_file.exists() {
+            tokio::fs::symlink(&wasm_file, &bg_wasm_file).await?;
+            println!(
+                "Created symlink: {} -> {}",
+                bg_wasm_file.display(),
+                wasm_file.display()
+            );
+        }
 
         let app = Router::new()
             .leptos_routes(&leptos_options, routes, {
@@ -68,6 +82,9 @@ impl Server {
             .map_err(|e| Error::AdressUsed { addr, source: e })?;
 
         println!("Listening: {addr:?}");
+
+        // Signal that server is ready
+        let _ = sender.send(());
 
         axum::serve(listener, app.into_make_service())
             .await

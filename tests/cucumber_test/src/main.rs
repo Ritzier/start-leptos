@@ -6,10 +6,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Trace::setup();
 
-    LeptosServer::build().await?;
-    // Currently would hanging the process, cause the Leptos server still have some issue
-    LeptosServer::serve().await?;
-    // LeptosServer::serve_from_command().await?; // The `cargo leptos serve` won't kill, need manually to close it outside
+    LeptosServer::serve_and_wait(5).await?;
 
     cucumber_test("tests/cucumber_test/features").await?;
 

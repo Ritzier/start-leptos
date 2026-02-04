@@ -1,4 +1,3 @@
-use std::net::SocketAddr;
 use std::path::Path;
 use std::process::Stdio;
 use std::time::Duration;
@@ -6,23 +5,25 @@ use std::time::Duration;
 use color_eyre::{Result, eyre};
 use server::Server;
 use tokio::process::Command;
+use tokio::sync::oneshot;
 
 use crate::{PortFinder, set_server_addr};
 
 pub struct LeptosServer;
 
 impl LeptosServer {
-    pub async fn build() -> Result<()> {
+    /// Compiles the `Frontend` with `cargo-leptos`
+    async fn compile_frontend() -> Result<()> {
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
             .nth(2)
-            .unwrap();
+            .ok_or_else(|| eyre::eyre!("Failed to find project root directory"))?;
 
-        println!("Compiling");
         let output = Command::new("cargo")
             .arg("leptos")
             .arg("build")
             .arg("--split")
+            .arg("--frontend-only")
             .current_dir(manifest_dir)
             .stdout(Stdio::null())
             .stderr(Stdio::null())
@@ -47,14 +48,18 @@ impl LeptosServer {
         Ok(())
     }
 
-    pub async fn serve() -> Result<()> {
+    /// Starts the server and signals readiness via oneshot channel
+    ///
+    /// Finds an available port, binds the server, and sends a signal
+    /// through the oneshot channel once the server is ready to accept requests
+    async fn serve(sender: oneshot::Sender<()>) -> Result<()> {
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
             .nth(2)
-            .unwrap();
+            .ok_or_else(|| eyre::eyre!("Failed to find project root directory"))?;
         let cargo_toml_path = manifest_dir.join("Cargo.toml");
 
-        // Server addr
+        // Find an available port to avoid conflicts
         let port = PortFinder::get_available_port()
             .await
             .map_err(|e| eyre::eyre!("{e}"))?;
@@ -63,53 +68,65 @@ impl LeptosServer {
             port,
         );
 
-        Server::cucumber_setup(addr, Some(cargo_toml_path.to_str().unwrap())).await?;
+        // Store address for tests to access
         set_server_addr(addr);
+
+        // Start server
+        let cargo_toml_str = cargo_toml_path
+            .to_str()
+            .ok_or_else(|| eyre::eyre!("Invalid UTF-8 in Cargo.toml path"))?;
+
+        Server::cucumber_setup(addr, Some(cargo_toml_str), sender).await?;
 
         Ok(())
     }
 
-    pub async fn serve_from_command() -> Result<()> {
-        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .ancestors()
-            .nth(2)
-            .unwrap();
+    /// Builds the frontend and starts the server, waiting for it to be ready
+    ///
+    /// This method:
+    /// 1. Compiles the frontend WASM
+    /// 2. Spawns the server in a background task
+    /// 3. Waits for the server to signal readiness (or times out)
+    ///
+    /// # Arguments
+    /// * `timeout_secs` - Maximum seconds to wait for server startup
+    ///
+    /// # Errors
+    /// Returns error if:
+    /// - Frontend compilation fails
+    /// - Server crashes during startup
+    /// - Timeout is reached before server is ready
+    pub async fn serve_and_wait(timeout: u64) -> Result<()> {
+        // Compile frontend
+        Self::compile_frontend().await?;
 
-        // Server addr
-        let port = PortFinder::get_available_port()
-            .await
-            .map_err(|e| eyre::eyre!("{e}"))?;
-        let addr = std::net::SocketAddr::new(
-            std::net::IpAddr::V4(std::net::Ipv4Addr::new(127, 0, 0, 1)),
-            port,
-        );
+        // Create channel for server
+        let (tx, rx) = oneshot::channel();
 
-        Command::new("cargo")
-            .arg("leptos")
-            .arg("serve")
-            .arg("--split")
-            .env("LEPTOS_SITE_ADDR", addr.to_string())
-            .current_dir(manifest_dir)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        // Spawn server in task
+        let server_handle = tokio::spawn(async move {
+            if let Err(e) = Self::serve(tx).await {
+                eprintln!("Server error: {e}");
+            }
+        });
 
-        wait_for_server_ready(addr, Duration::from_secs(5)).await?;
-        set_server_addr(addr);
-
-        Ok(())
-    }
-}
-
-async fn wait_for_server_ready(addr: SocketAddr, timeout: Duration) -> Result<()> {
-    let start = tokio::time::Instant::now();
-
-    while start.elapsed() < timeout {
-        if tokio::net::TcpStream::connect(addr).await.is_ok() {
-            return Ok(());
+        // Wait for server to be ready with timeout
+        match tokio::time::timeout(Duration::from_secs(timeout), rx).await {
+            Ok(Ok(())) => {
+                println!("Server is ready!");
+                Ok(())
+            }
+            Ok(Err(_)) => {
+                server_handle.abort();
+                Err(eyre::eyre!("Server crashed before becoming ready"))
+            }
+            Err(_) => {
+                server_handle.abort();
+                Err(eyre::eyre!(
+                    "Server failed to start within {} seconds",
+                    timeout
+                ))
+            }
         }
-        tokio::time::sleep(Duration::from_millis(100)).await;
     }
-
-    Err(eyre::eyre!("Server did not become ready within timeout"))
 }
