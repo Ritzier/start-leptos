@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use app::*;
 use axum::Router;
 use leptos::prelude::*;
@@ -45,7 +43,7 @@ impl Server {
         let leptos_options = conf.leptos_options;
         let routes = generate_route_list(App);
 
-        let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
+        let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
             .nth(1)
             .unwrap();
