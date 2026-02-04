@@ -13,6 +13,23 @@ pub async fn goto_dynamic_path(world: &mut AppWorld, path: String) -> Result<()>
     Ok(())
 }
 
+#[then(regex = r#"^I see an? "([^"]+)" with text "([^"]+)"$"#)]
+async fn i_see_element_with_text(
+    world: &mut AppWorld,
+    element_type: String,
+    text: String,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let h1_text = world
+        .find(Locator::Css(&element_type))
+        .await?
+        .text()
+        .await?;
+
+    assert_eq!(h1_text, text, "Wtf");
+
+    Ok(())
+}
+
 #[then(regex = r#"I see a button with "(.*)""#)]
 pub async fn check_button_with_text(world: &mut AppWorld, expected_text: String) -> Result<()> {
     let button_text = world.find(Locator::Css("button")).await?.text().await?;
