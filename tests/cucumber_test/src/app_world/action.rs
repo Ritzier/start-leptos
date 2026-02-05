@@ -1,10 +1,9 @@
-use std::time::Duration;
-
 use anyhow::Result;
 use cucumber::{given, then, when};
 use fantoccini::Locator;
 
 use super::AppWorld;
+use super::console_log::ConsoleLog;
 
 #[given(regex = r"^Goto (.+)$")]
 pub async fn goto_dynamic_path(world: &mut AppWorld, path: String) -> Result<()> {
@@ -53,10 +52,31 @@ pub async fn click_button_with_label(world: &mut AppWorld, label: String) -> Res
 
 #[then(regex = r#"the button label changes to "(.*)""#)]
 pub async fn check_button_label(world: &mut AppWorld, expected_label: String) -> Result<()> {
-    tokio::time::sleep(Duration::from_secs(1)).await;
-
     let button_text = world.find(Locator::Css("button")).await?.text().await?;
 
     assert_eq!(button_text, expected_label);
+    Ok(())
+}
+
+#[then("I should see the following console logs:")]
+pub async fn check_console_logs_table(
+    world: &mut AppWorld,
+    step: &cucumber::gherkin::Step,
+) -> Result<()> {
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+
+    let table = step
+        .table
+        .as_ref()
+        .ok_or_else(|| anyhow::Error::msg("Expected data table"))?;
+    let expected_console_log = ConsoleLog::from_table(table)?;
+
+    let logs = world.get_console_logs().await?;
+
+    assert_eq!(expected_console_log, logs);
+
+    // Clear Webdriver log
+    world.clear_console_logs().await?;
+
     Ok(())
 }

@@ -46,7 +46,7 @@ impl CargoGenerate {
             style,
             docker,
             cucumber,
-        } = self;
+        } = &self;
 
         let tempfile = TempDir::new()?;
         let output_dir = tempfile.as_ref().to_path_buf();
@@ -104,6 +104,6 @@ impl CargoGenerate {
         anyhow::ensure!(proj_meta.is_dir(), "test-proj is not a directory");
 
         // Generate Result
-        GenerateResult::new(tempfile)
+        GenerateResult::new(tempfile, self)
     }
 }

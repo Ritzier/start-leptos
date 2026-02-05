@@ -45,7 +45,7 @@ async fn build_chromedriver() -> Result<(Client, Child)> {
     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
 
     let cap: Capabilities = serde_json::from_str(
-        r#"{"browserName":"chrome","goog:chromeOptions":{"args":["--headless"]}}"#,
+        r#"{"goog:loggingPrefs":{"browser":"ALL","performance":"ALL"},"browserName":"chrome","goog:chromeOptions":{"args":["--headless"]}}"#,
     )?;
 
     let client = ClientBuilder::native()

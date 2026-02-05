@@ -76,7 +76,12 @@ impl LazyRoute for HomePage {
 
     fn view(_this: Self) -> AnyView {
         let (count, set_count) = signal(0);
-        let on_click = move |_| set_count.update(|count| *count += 1);
+        let on_click = move |_| {
+            set_count.update(|count| {
+                *count += 1;
+                leptos::logging::log!("Update num: {count}");
+            })
+        };
 
         view! {
             <h1>"Welcome to Leptos!"</h1>
