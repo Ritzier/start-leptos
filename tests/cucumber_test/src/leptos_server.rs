@@ -24,6 +24,7 @@ impl LeptosServer {
             .arg("build")
             .arg("--split")
             .arg("--frontend-only")
+            .arg("--release")
             .current_dir(manifest_dir)
             .stdout(Stdio::null())
             .stderr(Stdio::null())
