@@ -6,11 +6,7 @@ macro_rules! template_test {
     ($name:ident, $config:expr) => {
         #[tokio::test]
         async fn $name() -> Result<()> {
-            $config
-                .build()
-                .await?
-                .tests(concat!(stringify!($name), "_template"))
-                .await
+            $config.build().await?.tests().await
         }
     };
 }

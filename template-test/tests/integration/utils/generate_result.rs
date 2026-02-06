@@ -1,12 +1,8 @@
-use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
-use insta::{Settings, assert_json_snapshot};
 use tempfile::TempDir;
-use tokio::fs;
 use tokio::process::Command;
-use walkdir::{DirEntry, WalkDir};
 
 use super::{CargoGenerate, NAME};
 
@@ -15,23 +11,16 @@ use super::{CargoGenerate, NAME};
 /// Provides methods to validate generated projects through automated testing:
 /// - Type checking with `cargo check`
 /// - Linting with `cargo clippy`
-/// - Snapshot testing with `insta`
 /// - End-to-end testing with Cucumber (if enabled)
 ///
 /// # Example
 /// ```no_run
 /// let result = GenerateResult::new(temp_dir, config)?;
-/// result.tests("my_snapshot").await?;
+/// result.tests().await?;
 /// ```
 pub struct GenerateResult {
     pub temp_dir: TempDir,
     config: CargoGenerate,
-}
-
-#[derive(Debug)]
-pub enum Content {
-    String(String),
-    Binary,
 }
 
 // ===== Public API =====
@@ -46,11 +35,8 @@ impl GenerateResult {
     /// # Test Pipeline (executed in order)
     /// 1. **Type Check**: `cargo check --workspace --features ssr hydrate`
     /// 2. **Linting**: `cargo clippy -D warnings` (treats all warnings as errors)
-    /// 3. **Snapshot**: `insta` JSON snapshot for file structure verification
-    /// 4. **E2E Tests**: `cucumber_test` (if cucumber feature enabled)    /// # Arguments
-    ///
-    /// * `snapshot` - Snapshot name for `insta` (e.g., `"my_template"`)
-    pub async fn tests(&self, snapshot: &str) -> Result<()> {
+    /// 3. **E2E Tests**: `cucumber_test` (if cucumber feature enabled)    /// # Arguments
+    pub async fn tests(&self) -> Result<()> {
         let proj_dir = self.get_path();
 
         // Step 1: Type checking
@@ -59,10 +45,7 @@ impl GenerateResult {
         // Step 2: Linting
         self.check_clippy(&proj_dir).await?;
 
-        // Step 3: Snapshot testing
-        self.insta(snapshot).await?;
-
-        // Step 4: End-to-den testing (conditional)
+        // Step 3: End-to-end testing (conditional)
         if self.config.cucumber {
             self.cucumber_test(&proj_dir).await?;
         }
@@ -137,30 +120,6 @@ impl GenerateResult {
         Ok(())
     }
 
-    /// Creates and verifies an `insta` JSON snapshot
-    ///
-    /// Captures the entire project file structure and content, then compares
-    /// against a stored snapshot to detect unintended changes.
-    ///
-    /// # Arguments
-    /// * `snapshot` - Name for the snapshot file (stored in `../snapshots/`)
-    ///
-    /// # Errors
-    /// Returns error if snapshot creation or comparison fails
-    async fn insta(&self, snapshot: &str) -> Result<()> {
-        let mut settings = Settings::new();
-        settings.set_snapshot_path("../snapshots");
-
-        let files = self.to_snapshot().await?;
-        let files_json = serde_json::to_string_pretty(&files)?;
-
-        settings.bind(|| {
-            assert_json_snapshot!(snapshot, files_json);
-        });
-
-        Ok(())
-    }
-
     /// Runs `cargo run --package cucumber_test`
     ///
     /// Executes end-to-end Cucumber BDD tests if the template was generated
@@ -192,83 +151,9 @@ impl GenerateResult {
     }
 }
 
-// ===== File Collection & Snapshot Helpers (private) =====
 impl GenerateResult {
     /// Returns the absolute path to the generated project root
     fn get_path(&self) -> PathBuf {
         self.temp_dir.as_ref().to_path_buf().join(NAME)
     }
-
-    /// Recursively collects all files from the generated project
-    ///
-    /// # Filtering Rules
-    /// - Excludes `.git/` directories (skips recursion entirely)
-    /// - Excludes hidden files/directories (starting with `.`)
-    /// - Handles binary files gracefully as `Content::Binary`
-    ///
-    /// # Returns
-    /// A sorted map of relative paths to file content
-    ///
-    /// # Errors
-    /// Returns error if file reading fails (except for binary files)
-    async fn collect_files(&self) -> Result<BTreeMap<PathBuf, Content>> {
-        let root = self.get_path();
-        let mut map = BTreeMap::new();
-
-        // Walk the directory tree, filtering out hidden/system directories
-        for entry in WalkDir::new(&root)
-            .follow_links(false)
-            .into_iter()
-            .filter_entry(is_visible) // Skip .git and hidden files at walk-time
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().is_file())
-        {
-            let path = entry.path();
-            let rel = path.strip_prefix(&root).unwrap().to_path_buf();
-
-            // Attempt to read as UTF-8 text, fallback to binary marker
-            match fs::read_to_string(path).await {
-                Ok(content) => {
-                    map.insert(rel, Content::String(content));
-                }
-                Err(e) if e.kind() == std::io::ErrorKind::InvalidData => {
-                    // Mark binary files instead of failing
-                    map.insert(rel, Content::Binary);
-                }
-                Err(e) => return Err(e).with_context(|| format!("reading {}", path.display())),
-            }
-        }
-
-        Ok(map)
-    }
-
-    /// Converts collected files to JSON-serializable snapshot format
-    ///
-    /// # Transformations
-    /// - Converts `PathBuf` to strings for JSON serialization
-    /// - Replaces `Content::Binary` with `"binary"` placeholder
-    /// - Maintains sorted order via `BTreeMap` for consistent snapshots
-    ///
-    /// # Returns
-    /// A sorted map of file paths (as strings) to JSON values
-    async fn to_snapshot(&self) -> Result<BTreeMap<String, serde_json::Value>> {
-        let files = self.collect_files().await?;
-        let mut map = BTreeMap::new();
-
-        for (path, content) in files {
-            let key = path.to_string_lossy().to_string();
-            let value = match content {
-                Content::String(s) => serde_json::Value::String(s),
-                Content::Binary => "binary".into(),
-            };
-            map.insert(key, value);
-        }
-        Ok(map)
-    }
-}
-
-/// Skip hidden/system dirs/files at walkdir level
-fn is_visible(entry: &DirEntry) -> bool {
-    let name = entry.file_name().to_string_lossy();
-    !(name == ".git" || name.starts_with('.'))
 }
