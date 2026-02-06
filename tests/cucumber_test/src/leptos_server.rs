@@ -114,7 +114,7 @@ impl LeptosServer {
         // Wait for server to be ready with timeout
         match tokio::time::timeout(Duration::from_secs(timeout), rx).await {
             Ok(Ok(())) => {
-                println!("Server is ready!");
+                tracing::info!("Server is ready!");
                 Ok(())
             }
             Ok(Err(_)) => {

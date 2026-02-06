@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::Result;
 use cucumber::{given, then, when};
 use fantoccini::Locator;
@@ -63,15 +65,15 @@ pub async fn check_console_logs_table(
     world: &mut AppWorld,
     step: &cucumber::gherkin::Step,
 ) -> Result<()> {
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-
     let table = step
         .table
         .as_ref()
         .ok_or_else(|| anyhow::Error::msg("Expected data table"))?;
     let expected_console_log = ConsoleLog::from_table(table)?;
 
-    let logs = world.get_console_logs().await?;
+    let logs = world
+        .wait_for_console_logs(&expected_console_log, Duration::from_secs(1))
+        .await?;
 
     assert_eq!(expected_console_log, logs);
 

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::Result;
 use cucumber::gherkin::Table;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -64,6 +66,26 @@ impl AppWorld {
             .map_err(|e| anyhow::Error::msg(format!("Failed to parse console logs: {}", e)))?;
 
         Ok(logs)
+    }
+
+    pub async fn wait_for_console_logs(
+        &mut self,
+        expected: &[ConsoleLog],
+        timeout_dur: Duration,
+    ) -> Result<Vec<ConsoleLog>> {
+        tokio::time::timeout(timeout_dur, async {
+            loop {
+                let logs = self.get_console_logs().await?;
+
+                if logs.as_slice() == expected {
+                    return Ok(logs);
+                }
+
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .map_err(|_| anyhow::Error::msg("Timed out waiting for expected console logs"))?
     }
 
     pub async fn clear_console_logs(&mut self) -> Result<()> {
