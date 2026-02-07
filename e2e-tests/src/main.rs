@@ -1,4 +1,4 @@
-use cucumber_test::{LeptosServer, Trace, cucumber_test};
+use e2e_tests::{LeptosServer, Trace, cucumber_test};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,7 +8,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     LeptosServer::serve_and_wait(5).await?;
 
-    cucumber_test("tests/cucumber_test/features").await?;
+    cucumber_test("e2e-tests/features").await?;
 
     Ok(())
 }

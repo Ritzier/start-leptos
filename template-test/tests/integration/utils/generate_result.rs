@@ -35,7 +35,7 @@ impl GenerateResult {
     /// # Test Pipeline (executed in order)
     /// 1. **Type Check**: `cargo check --workspace --features ssr hydrate`
     /// 2. **Linting**: `cargo clippy -D warnings` (treats all warnings as errors)
-    /// 3. **E2E Tests**: `cucumber_test` (if cucumber feature enabled)    /// # Arguments
+    /// 3. **E2E Tests**: `e2e-tests` (if cucumber feature enabled)
     pub async fn tests(&self) -> Result<()> {
         let proj_dir = self.get_path();
 
@@ -120,7 +120,7 @@ impl GenerateResult {
         Ok(())
     }
 
-    /// Runs `cargo run --package cucumber_test`
+    /// Runs `cargo run --package cucumber`
     ///
     /// Executes end-to-end Cucumber BDD tests if the template was generated
     /// with Cucumber support enabled.
@@ -131,16 +131,16 @@ impl GenerateResult {
         let output = Command::new("cargo")
             .current_dir(proj_dir)
             .arg("run")
-            .arg("--package")
-            .arg("cucumber_test")
+            .arg("--bin")
+            .arg("cucumber")
             .output()
             .await
-            .context("`cargo run --package cucumber_test` failed")?;
+            .context("`cargo run --bin cucumber` failed")?;
 
         anyhow::ensure!(
             output.status.success(),
             anyhow::anyhow!(
-                "`cargo run --package cucumber_test` failed with status {:?}\nStdout:\n{}\n\nStderr:\n{}",
+                "`cargo run --bin cucumber` failed with status {:?}\nStdout:\n{}\n\nStderr:\n{}",
                 output.status,
                 String::from_utf8_lossy(&output.stdout),
                 String::from_utf8_lossy(&output.stderr)

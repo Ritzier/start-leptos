@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["app", "frontend",{% if cucumber == true %} "tests/cucumber_test",{% endif %} "server"]
+members = ["app", "frontend", "server"{% if cucumber == true %}, "e2e-tests"{% endif %}]
 
 [profile.wasm-release]
 inherits = "release"

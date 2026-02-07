@@ -1,14 +1,14 @@
 [package]
-name = "cucumber_test"
+name = "e2e-tests"
 version = "0.1.0"
 edition = "2024"
 
 [[bin]]
-name = "cucumber_tests"
+name = "cucumber"
 path = "src/main.rs"
 
 [dependencies]
-server = { path = "../../server", features = ["ssr", "cucumber"] }
+server = { path = "../server", features = ["ssr", "cucumber"] }
 
 # Async runtime
 tokio = { version = "1.47.0", features = [

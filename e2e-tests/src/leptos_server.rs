@@ -16,7 +16,7 @@ impl LeptosServer {
     async fn compile_frontend() -> Result<()> {
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
-            .nth(2)
+            .nth(1)
             .ok_or_else(|| eyre::eyre!("Failed to find project root directory"))?;
 
         let output = Command::new("cargo")
@@ -56,7 +56,7 @@ impl LeptosServer {
     async fn serve(sender: oneshot::Sender<()>) -> Result<()> {
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
-            .nth(2)
+            .nth(1)
             .ok_or_else(|| eyre::eyre!("Failed to find project root directory"))?;
         let cargo_toml_path = manifest_dir.join("Cargo.toml");
 

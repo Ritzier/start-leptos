@@ -37,5 +37,5 @@ file::delete("Docker");
 let cucumber = variable::get("cucumber");
 
 if (cucumber == false) {
-    file::delete("tests");
+    file::delete("e2e-tests");
 }

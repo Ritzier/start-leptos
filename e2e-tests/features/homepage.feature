@@ -37,4 +37,3 @@ Feature: Homepage UI
     And I should see the following console logs:
         | Update num: 2 | log |
 {% endif -%}
-
