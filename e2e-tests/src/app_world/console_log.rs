@@ -22,6 +22,23 @@ where
 }
 
 impl ConsoleLog {
+    /// Creates a new ConsoleLog with validation
+    pub fn new(level: impl Into<String>, message: impl Into<String>) -> Self {
+        Self {
+            level: level.into().to_lowercase(),
+            message: vec![message.into().trim().to_string()],
+        }
+    }
+
+    /// Builder for multiple messages
+    #[expect(dead_code)]
+    pub fn with_messages(level: impl Into<String>, messages: Vec<String>) -> Self {
+        Self {
+            level: level.into().to_lowercase(),
+            message: messages.into_iter().map(|s| s.trim().to_string()).collect(),
+        }
+    }
+
     /// Converts a Gherkin table into a Vec of ConsoleLog
     ///
     /// Expected table format:
@@ -43,12 +60,9 @@ impl ConsoleLog {
                 let message = row[0].trim().to_string();
                 let level = row[1].trim().to_lowercase().to_string();
 
-                Ok(ConsoleLog {
-                    level,
-                    message: vec![message],
-                })
+                Ok(ConsoleLog::new(level, message))
             })
-            .collect::<Result<Vec<_>>>() // Collect into Result<Vec<ConsoleLog>>
+            .collect::<Result<Vec<_>>>()
     }
 }
 
