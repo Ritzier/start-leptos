@@ -1,5 +1,5 @@
 mod app_world;
-use app_world::AppWorld;
+pub use app_world::{AppWorld, ConsoleLog};
 
 mod leptos_server;
 pub use leptos_server::LeptosServer;

@@ -30,15 +30,6 @@ impl ConsoleLog {
         }
     }
 
-    /// Builder for multiple messages
-    #[expect(dead_code)]
-    pub fn with_messages(level: impl Into<String>, messages: Vec<String>) -> Self {
-        Self {
-            level: level.into().to_lowercase(),
-            message: messages.into_iter().map(|s| s.trim().to_string()).collect(),
-        }
-    }
-
     /// Converts a Gherkin table into a Vec of ConsoleLog
     ///
     /// Expected table format:

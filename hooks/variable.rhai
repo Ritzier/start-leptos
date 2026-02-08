@@ -39,3 +39,9 @@ let cucumber = variable::get("cucumber");
 if (cucumber == false) {
     file::delete("e2e-tests");
 }
+
+// ====== Benchmark =====
+let benchmark = variable::get("benchmark");
+if (benchmark == false) {
+    file::delete("benchmark");
+}

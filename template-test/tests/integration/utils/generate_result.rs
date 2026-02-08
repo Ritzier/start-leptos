@@ -50,6 +50,10 @@ impl GenerateResult {
             self.cucumber_test(&proj_dir).await?;
         }
 
+        if self.config.benchmark {
+            self.benchmark(&proj_dir).await?;
+        }
+
         Ok(())
     }
 }
@@ -141,6 +145,31 @@ impl GenerateResult {
             output.status.success(),
             anyhow::anyhow!(
                 "`cargo run --bin cucumber` failed with status {:?}\nStdout:\n{}\n\nStderr:\n{}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            )
+        );
+
+        Ok(())
+    }
+
+    async fn benchmark(&self, proj_dir: &PathBuf) -> Result<()> {
+        let output = Command::new("cargo")
+            .current_dir(proj_dir)
+            .arg("run")
+            .arg("--bin")
+            .arg("benchmark")
+            .arg("--")
+            .arg("5")
+            .output()
+            .await
+            .context("`cargo run --bin benchmark` failed")?;
+
+        anyhow::ensure!(
+            output.status.success(),
+            anyhow::anyhow!(
+                "`cargo run --bin benchmark` failed with status {:?}\nStdout:\n{}\n\nStderr:\n{}",
                 output.status,
                 String::from_utf8_lossy(&output.stdout),
                 String::from_utf8_lossy(&output.stderr)

@@ -21,6 +21,7 @@ template_test!(
         style: Style::Unocss,
         docker: true,
         cucumber: true,
+        benchmark: true
     }
 );
 
@@ -64,11 +65,31 @@ template_test!(
     }
 );
 
+template_test!(
+    cucumber_and_benchmark,
+    CargoGenerate {
+        cucumber: true,
+        benchmark: true,
+        ..Default::default()
+    }
+);
+
 // Websocket with test
 template_test!(
     websocket_and_cucumber_only,
     CargoGenerate {
         websocket: true,
+        cucumber: true,
+        ..Default::default()
+    }
+);
+
+template_test!(
+    websocket_and_cucumber_benchmark,
+    CargoGenerate {
+        websocket: true,
+        cucumber: true,
+        benchmark: true,
         ..Default::default()
     }
 );

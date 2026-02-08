@@ -13,6 +13,9 @@ style = { prompt = "Which style?", default = "default", type = "string", choices
 docker = { prompt = "Docker?", default = false, type = "bool" }
 cucumber = { prompt = "Cucumber?", default = false, type = "bool" }
 
+[conditional.'cucumber == true'.placeholders]
+benchmark = { prompt = "Benchmark?", default = false, type = "bool" }
+
 [hooks]
 init = ["hooks/initialize.rhai"]
 pre = ["hooks/variable.rhai"]

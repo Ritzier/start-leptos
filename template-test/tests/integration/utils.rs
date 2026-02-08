@@ -18,6 +18,7 @@ pub struct CargoGenerate {
     pub style: Style,
     pub docker: bool,
     pub cucumber: bool,
+    pub benchmark: bool,
 }
 
 #[derive(Debug, Default)]
@@ -40,12 +41,14 @@ impl Display for Style {
 
 impl CargoGenerate {
     pub async fn build(self) -> Result<GenerateResult> {
+        eprintln!("{self:#?}");
         let Self {
             websocket,
             tracing,
             style,
             docker,
             cucumber,
+            benchmark,
         } = &self;
 
         let tempfile = TempDir::new()?;
@@ -75,7 +78,12 @@ impl CargoGenerate {
             .arg("-d")
             .arg(format!("docker={}", docker.to_string().to_lowercase()))
             .arg("-d")
-            .arg(format!("cucumber={}", cucumber.to_string().to_lowercase()));
+            .arg(format!("cucumber={}", cucumber.to_string().to_lowercase()))
+            .arg("-d")
+            .arg(format!(
+                "benchmark={}",
+                benchmark.to_string().to_lowercase()
+            ));
 
         unsafe {
             cmd.pre_exec(move || {
