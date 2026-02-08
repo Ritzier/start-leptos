@@ -22,12 +22,12 @@ cargo generate ritzier/start-leptos
 
 ### Interacitve Prompts
 
-- **Websocket?** (default: false)
-- **Tracing?** (default: false)
+- **Websocket?** (default: false) - Enable real-time **Websocket** communication with `rkyv`
+- **Tracing?** (default: false) - Add structed logging with `tracing`
 - **Style?**: Choices: `default`, `unocss` (default: `default`)
-- **Docker?** (default: false)
-- **Cucumber?** (default: false)
-- **Playwright?** (default: false)
+- **Docker?** (default: false) - Include **Docker** setup with multi-stage builds
+- **Cucumber?** (default: false) - Add BDD end-to-end testing
+  - **Benchmark?** (default: false) - Add performance benchmarking
 
 ### Commands
 
@@ -96,9 +96,15 @@ my-leptos-app/
 ├── style/                  # SCSS styles
 ├── public/
 │   └── uno.css             # Generated UnoCSS (if `Unocss` selected)
-└── tests/
-    ├── cucumber_test/      # BDD tests (if `Cucumber` selected)
-    └── playwright/         # E2E tests (if `Playwright` selected)
+├── e2e-tests/              # Cucumber BDD tests (if Cucumber enabled)
+│   ├── features/           # Gherkin feature files
+│   └── src/
+│       ├── app_world/      # Test world and step definitions
+│       └── utils/          # WebDriver helpers
+└── benchmark/              # Performance benchmarking (if Benchmark enabled)
+    └── src/
+        ├── benchmarks/     # Benchmark implementations
+        └── cli.rs          # CLI argument parsing
 ```
 
 ## Features
@@ -157,27 +163,71 @@ Enable structured logging with `tracing` and `tracing-subscriber` for better obs
   - `npm run watch` for development HMR
   - `npm run build` for production minification
 
-## Testing Frameworks
+## Testing && Benchmarking
 
-### Cucumber (BDD) (Outdated)
+### Cucumber (BDD)
 
-- WebDriver-based browser automation with `Fantoccini`
-- Supports Chrome (`chromedriver`) and Firefox (`geckodriver`)
-- Feature files in `tests/cucumber_test/features/`
-- Run: `cargo make chrome` or `cargo make both`
+When enabled, provides behavior-driven development testing with:
 
-### Playwright (Outdated)
+- **WebDriver automation**: Browser testing with `Fantoccini`
+- **Cross-browser support**: Chrome (`chromedriver`) and Firefox (`geckodriver`)
+- **Gherkin syntax**: Human-readable test scenario in `e2e-tests/feature/`
+- **Console log validation**: Verify console output
+- **Test helpers**: Pre-configured `AppWorld` with comman step definitions
 
-- Modern E2E testing with Node.js runtime
-- Cross-browser support (Chromium/Firefox/WebKit)
-- TypeScript test files in `tests/playwright/`
-- Run: `cargo make playwright`
+```bash
+# Run all feature files
+cargo run --bin cucumber
+
+# Set WebDriver (default: chromedriver)
+WEBDRIVER=geckodriver cargo run --bin cucumber
+```
+
+### Benchmark (Performance Testing)
+
+**Note**: Only available when `Cucumber` is enabled (shares test infrastructure)
+
+Provides performance benchmarking with statistical analysis:
+
+- **CLI interface**: Specify iteration count via `command-line` argument
+
+- **Flexible metrics**: Dynamic benchmark naming with `HashMap-based` storage
+
+- **Statistical analysis**: Calculates avg, min, max, median, and standard deviation
+
+- **Colorized output**: Easy-to-read terminal output with `owo-colors`
+
+- **Feature-aware**: Different benchmarks for `WebSocket` vs `default mode`
+
+#### Benchmarks:
+
+##### WebSocket Mode:
+
+- Connect handshake timing
+
+- Disconnect closure timing
+
+##### Default Mode:
+
+- Button click and state update timing
+
+##### Running Benchmarks
+
+```bash
+# Run 20 iterations
+cargo run --bin benchmark -- 20
+```
 
 ## Template Features
 
 - **Workspace architecture**: Modular `app/frontend/server` separation
-- **Lazy loading by default**: Automatically be `code-split` into a separate `WASM` chunk that loads on-demand
-- **Optional WebSocket**: Real-time communication with `rkyv` encode
-- **Conditional test setup**: Only includes selected test frameworks
-- **Auto-cleanup**: Template removes unused files after generation
-- **Hot reload**: Leptos watch mode with live CSS injection
+
+- **Lazy loading by default**: Automatically code-split into separate WASM chunks that load on-demand
+
+- **Optional WebSocket**: Real-time communication with `rkyv` encoding
+
+- **Optional testing**: BDD tests with `Cucumber` + optional performance benchmarking
+
+- **Conditional setup**: Only includes selected features
+
+- **Hot reload**: **Leptos** watch mode with live CSS injection
