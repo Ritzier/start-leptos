@@ -3,7 +3,7 @@ use leptos::prelude::*;
 use leptos_router::{LazyRoute, lazy_route};
 use uuid::Uuid;
 
-use crate::structs::WebSocketManager;
+use super::ws::WebSocketManager;
 
 pub struct HomePage {
     websocket_manager: WebSocketManager,

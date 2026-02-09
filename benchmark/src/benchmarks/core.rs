@@ -214,8 +214,8 @@ impl Benchmarks {
         let expected = vec![
             ConsoleLog::new("error", "WebSocket Closed: code: 1005, reason:"),
             ConsoleLog::new(
-                "log",
-                "Websocket closed: error reaching server to call server function: WebSocket Closed: code: 1005, reason:",
+                "error",
+                "error: error reaching server to call server function: WebSocket Closed: code: 1005, reason:",
             ),
         ];
 

@@ -17,7 +17,7 @@ Feature: Homepage UI
     Then the button label changes to "Connect"
     Then I should see the following console logs:
         | WebSocket Closed: code: 1005, reason: | error |
-        | Websocket closed: error reaching server to call server function: WebSocket Closed: code: 1005, reason: | log |
+        | error: error reaching server to call server function: WebSocket Closed: code: 1005, reason: | error |
 {% else -%}
 {%- raw %}@{% endraw %}homepage
 @homepage

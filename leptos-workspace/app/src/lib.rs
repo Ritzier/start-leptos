@@ -1,6 +1,6 @@
 mod pages;
 {%- if websocket == true %}
-pub mod structs;
+pub mod ws_core;
 {%- endif %}
 
 mod app;
