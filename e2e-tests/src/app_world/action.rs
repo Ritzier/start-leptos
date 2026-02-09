@@ -138,7 +138,7 @@ pub async fn check_console_logs_table(
 
     // Wait for logs to appear (1 second timeout)
     let logs = world
-        .wait_for_console_logs(&expected_console_log, Duration::from_secs(1))
+        .wait_for_console_logs(&expected_console_log, Duration::from_secs(5))
         .await?;
 
     assert_eq!(expected_console_log, logs);

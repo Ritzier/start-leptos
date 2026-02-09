@@ -1,7 +1,7 @@
 // ====== Websocket =====
 let websocket = variable::get("websocket");
 if websocket == false {
-    file::delete("app/src/structs");
+    file::delete("app/src/ws_core");
 }
 
 // ===== Tracing =====
