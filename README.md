@@ -83,19 +83,24 @@ services:
 ```text
 my-leptos-app/
 ├── Cargo.toml              # Workspace config
-├── Dockerfile              # Multi-stage Docker build (if `Docker` enabled)
-├── docker-compose.yml      # Container orchestration (if `Docker` enabled)
-├── uno.config.ts           # UnoCSS config (if `Unocss` selected)
-├── package.json            # Node deps (if `UnoCSS` selected)
+├── Dockerfile              # Multi-stage Docker build (if Docker enabled)
+├── docker-compose.yml      # Container orchestration (if Docker enabled)
+├── uno.config.ts           # UnoCSS config (if UnoCSS selected)
+├── package.json            # Node deps (if UnoCSS selected)
 ├── app/                    # Shared app logic
 │   └── src/
 │       ├── pages/          # Lazy-loaded route pages
-│       └── structs/        # WebSocket structs (if `Websocket` enabled)
+│       │   └── home/
+│       │       ├── page.rs
+│       │       └── ws/     # WebSocket implementation (if WebSocket enabled)
+│       └── ws_core/        # Generic WebSocket traits (if WebSocket enabled)
+│           ├── client.rs   # Client-side trait & manager
+│           └── server.rs   # Server-side trait & backend
 ├── frontend/               # WASM library
 ├── server/                 # Axum SSR server
 ├── style/                  # SCSS styles
 ├── public/
-│   └── uno.css             # Generated UnoCSS (if `Unocss` selected)
+│   └── uno.css             # Generated UnoCSS (if UnoCSS selected)
 ├── e2e-tests/              # Cucumber BDD tests (if Cucumber enabled)
 │   ├── features/           # Gherkin feature files
 │   └── src/
@@ -105,6 +110,7 @@ my-leptos-app/
     └── src/
         ├── benchmarks/     # Benchmark implementations
         └── cli.rs          # CLI argument parsing
+
 ```
 
 ## Features
@@ -120,27 +126,149 @@ Enable real-time bidirectional communication with optional `Websocket` support
 
 #### When Enabled
 
-The template includes:
+The template includes a generic, reusable WebSocket system:
 
-- `WebsocketManager`: Connection lifecycle management with `StoredValue` and `RwSignal` for efficient cloning
-- `rkyv` **serialization**: Zero-copy binary encoding
-- `Request`/`Response` **enums**: Type-safe message handling with `Archive`, `Deserialize`, `Serialize` traits
+#### Core Traits
 
-Usage Example:
+- `WebSocketClient` trait: Define client-side message handling
+- `WebSocketMessage` trait: Define server-side message processing
+- `GenericWebSocketManager<T>`: Type-safe connection manager
+- `GenericWebsocketBackend<T>`: Generic server-side handler
+
+#### Built-in Implementation
+
+- `rkyv` serialization: Zero-copy binary encoding
+
+- Type-safe `Request/Response` enums with `Archive`, `Deserialize`, `Serialize` traits
+
+- Automatic connection lifecycle management with reactive signals
+
+#### Basic Usage (Home Page)
 
 ```rust
+use uuid::Uuid;
+
 // Connect to WebSocket
 let manager = WebSocketManager::new(Uuid::new_v4());
 manager.connect();
 
-// Send messages
-manager.send(Request::CustomMessage { data: "hello" })?;
+// WebSocket automatically handles handshake
+// UI reactively updates via is_connected signal
 
 // Disconnect
 manager.disconnect();
 ```
 
-The manager automatically handles connection state, message sending, and stream processing in a spawned task
+#### Creating Custom WebSocket Endpoints
+
+```rust
+// 1. Define your message types
+#[derive(Debug, Clone, Archive, Deserialize, Serialize)]
+pub enum MyRequest {
+    Subscribe { topic: String },
+    Unsubscribe,
+}
+
+#[derive(Debug, Clone, Archive, Deserialize, Serialize)]
+pub enum MyResponse {
+    Data { payload: String },
+    Error { message: String },
+}
+
+// 2. Implement WebSocketClient trait
+use crate::ws_core::client::{WebSocketClient, GenericWebSocketManager};
+
+#[derive(Clone)]
+pub struct MyWebSocketClient {
+    topic: StoredValue<String>,
+}
+
+impl WebSocketClient for MyWebSocketClient {
+    type Request = MyRequest;
+    type Response = MyResponse;
+
+    fn create_handshake_request(&self) -> Self::Request {
+        MyRequest::Subscribe {
+            topic: self.topic.get_value(),
+        }
+    }
+
+    fn create_disconnect_request(&self) -> Self::Request {
+        MyRequest::Unsubscribe
+    }
+
+    fn handle_response(response: Self::Response, is_connected: RwSignal<bool>) {
+        match response {
+            MyResponse::Data { payload } => {
+                is_connected.set(true);
+                leptos::logging::log!("Received: {payload}");
+            }
+            MyResponse::Error { message } => {
+                leptos::logging::error!("Error: {message}");
+            }
+        }
+    }
+
+    async fn get_stream(
+        rx: UnboundedReceiver<Result<Self::Request, ServerFnError>>,
+    ) -> Result<BoxedStream<Self::Response, ServerFnError>, ServerFnError> {
+        my_websocket(rx.into()).await
+    }
+}
+
+// 3. Implement server-side handler
+#[cfg(feature = "ssr")]
+use crate::ws_core::server::WebSocketMessage;
+
+pub struct MyWebSocketHandler;
+
+impl WebSocketMessage for MyWebSocketHandler {
+    type Request = MyRequest;
+    type Response = MyResponse;
+
+    fn handle_request(
+        request: Self::Request,
+        tx: &UnboundedSender<Result<Self::Response, ServerFnError>>,
+    ) -> bool {
+        match request {
+            MyRequest::Subscribe { topic } => {
+                tracing::info!("Subscribed to: {topic}");
+                tx.unbounded_send(Ok(MyResponse::Data {
+                    payload: format!("Welcome to {topic}"),
+                })).ok();
+                true // Keep connection alive
+            }
+            MyRequest::Unsubscribe => {
+                tracing::info!("Unsubscribed");
+                false // Close connection
+            }
+        }
+    }
+}
+
+// 4. Create server function
+#[server(protocol = Websocket<RkyvEncoding, RkyvEncoding>)]
+pub async fn my_websocket(
+    input: BoxedStream<MyRequest, ServerFnError>,
+) -> Result<BoxedStream<MyResponse, ServerFnError>, ServerFnError> {
+    use crate::ws_core::server::GenericWebsocketBackend;
+
+    let (tx, rx) = mpsc::unbounded();
+    let backend = GenericWebsocketBackend::<MyWebSocketHandler>::new(input, tx);
+
+    tokio::spawn(async move {
+        backend.serve().await;
+    });
+
+    Ok(rx.into())
+}
+
+// 5. Use in your component
+pub type MyWebSocketManager = GenericWebSocketManager<MyWebSocketClient>;
+
+let manager = MyWebSocketManager::new(topic);
+manager.connect();
+```
 
 ### Tracing (Optional)
 
@@ -231,3 +359,23 @@ cargo run --bin benchmark -- 20
 - **Conditional setup**: Only includes selected features
 
 - **Hot reload**: **Leptos** watch mode with live CSS injection
+
+## WebSocket File Structure
+
+```text
+app/src/
+├── ws_core/                  # Generic WebSocket abstractions
+│   ├── mod.rs
+│   ├── client.rs             # WebSocketClient trait + GenericWebSocketManager
+│   └── server.rs             # WebSocketMessage trait + GenericWebsocketBackend
+└── pages/
+    └── home/
+        ├── mod.rs
+        ├── page.rs           # Page component
+        └── ws/               # Page-specific WebSocket implementation
+            ├── mod.rs
+            ├── messages.rs   # Request/Response enums
+            ├── client.rs     # Implements WebSocketClient
+            ├── connection.rs # Server function
+            └── handler.rs    # Implements WebSocketMessage (SSR only)
+```
