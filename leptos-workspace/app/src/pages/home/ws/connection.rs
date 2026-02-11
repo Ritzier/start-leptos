@@ -15,7 +15,8 @@ pub async fn rkyv_websocket(
     use crate::ws_core::server::GenericWebsocketBackend;
 
     let (tx, rx) = mpsc::unbounded();
-    let websocket_backend = GenericWebsocketBackend::<RkyvWebSocketMessage>::new(input, tx);
+    let websocket_backend =
+        GenericWebsocketBackend::<RkyvWebSocketMessage>::new(input, tx, RkyvWebSocketMessage);
 
     tokio::spawn(async move {
         websocket_backend.serve().await;
