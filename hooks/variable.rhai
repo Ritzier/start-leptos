@@ -43,6 +43,10 @@ if (cucumber == false) {
 
 // ====== Benchmark =====
 let benchmark = variable::get("benchmark");
+if benchmark == "" {
+    variable::set("benchmark", false);
+    benchmark = false;
+}
 if (benchmark == false) {
     file::delete("benchmark");
 }
