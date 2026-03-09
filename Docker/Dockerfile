@@ -1,3 +1,4 @@
+
 # ===== Builder Stage =====
 FROM rust:bookworm AS builder
 
@@ -14,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 {% if style == "unocss" %}
 # Install Node.js and npm for UnoCSS (changes rarely)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
@@ -32,17 +33,8 @@ RUN curl -L --proto '=https' --tlsv1.2 -sSf \
 # Install cargo-leptos (changes rarely)
 RUN cargo binstall cargo-leptos --no-confirm
 
-# Install Dart (changes rarely)
-ARG DART_VERSION=3.10.7
-RUN curl -o dart-sdk.zip https://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip && \
-    unzip dart-sdk.zip -d /usr/lib && \
-    rm dart-sdk.zip
-
-# Setup Dart environment
-ENV PATH="/usr/lib/dart-sdk/bin:/root/.pub-cache/bin:${PATH}"
-
 # Verify installations
-RUN dart --version && cargo-leptos --version
+RUN cargo-leptos --version
 
 {% if style == "unocss" %}
 # Copy package.json and install Node dependencies (for better caching)
@@ -53,20 +45,20 @@ RUN npm install
 COPY uno.config.ts ./
 
 {% endif -%}
-# Copy only dependency manifests first (for better caching)
-COPY Cargo.toml ./
+# Copy only dependency manifests and lockfile first (for better caching)
+COPY Cargo.toml Cargo.lock ./
 COPY app/Cargo.toml ./app/
 COPY frontend/Cargo.toml ./frontend/
 COPY server/Cargo.toml ./server/
 
-# Create dummy source files to cache dependencies
+# Create dummy source files so cargo fetch can parse manifests
 RUN mkdir -p app/src frontend/src server/src && \
     echo "fn main() {}" > server/src/main.rs && \
-    echo "pub fn main() {}" > app/src/lib.rs && \
-    echo "pub fn main() {}" > frontend/src/lib.rs
+    echo "" > app/src/lib.rs && \
+    echo "" > frontend/src/lib.rs
 
-# Pre-build dependencies (this layer will be cached)
-RUN cargo build --release || true
+# Pre-fetch all dependencies (no compilation, just download)
+RUN cargo fetch
 
 # Remove dummy files
 RUN rm -rf app/src frontend/src server/src
@@ -80,11 +72,6 @@ COPY server/src ./server/src
 COPY style ./style
 COPY public ./public
 
-{% if style == "unocss" %}
-# Build UnoCSS before Leptos build (generates public/uno.css)
-RUN npm run build
-
-{% endif -%}
 # Build the actual application
 RUN cargo leptos build -rP --split
 
@@ -114,3 +101,4 @@ USER appuser
 EXPOSE 3000
 
 CMD ["./server"]
+
