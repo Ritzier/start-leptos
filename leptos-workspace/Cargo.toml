@@ -2,6 +2,19 @@
 resolver = "2"
 members = ["app", "frontend", "server"{% if cucumber == true %}, "e2e-tests"{% if benchmark == true %}, "benchmark"{% endif %}{% endif %}]
 
+[profile.dev]
+opt-level = 0
+debug = 1
+incremental = true
+codegen-units = 1024
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+panic = "abort"
+strip = true
+
 [profile.wasm-release]
 inherits = "release"
 codegen-units = 1
