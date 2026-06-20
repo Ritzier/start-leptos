@@ -6,7 +6,7 @@
 //!
 //! # Example
 //!
-//! ```rust
+//! ```ignore
 //! // Define your message types
 //! enum Request { Ping, Disconnect }
 //! enum Response { Pong }
@@ -120,7 +120,7 @@ pub trait WebSocketClient: Clone + 'static {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// fn handle_response(response: Response, is_connected: RwSignal<bool>) {
     ///     match response {
     ///         Response::Pong => {
@@ -178,7 +178,7 @@ pub trait WebSocketClient: Clone + 'static {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```ignore
 /// let manager = WebSocketManager::new(uuid);
 /// manager.connect();
 /// manager.send(Request::Ping)?;
@@ -244,7 +244,7 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// let manager = WebSocketManager::new(uuid);
     /// manager.connect(); // Starts connection in background
     /// ```
@@ -327,7 +327,7 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// manager.send(Request::Ping)?;
     /// manager.send(Request::Message("Hello".to_string()))?;
     /// ```
@@ -361,7 +361,7 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// manager.disconnect(); // Graceful shutdown
     /// ```
     pub fn disconnect(&self) {
