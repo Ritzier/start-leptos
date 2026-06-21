@@ -1,8 +1,7 @@
 use leptos::prelude::*;
 use leptos::server_fn::BoxedStream;
 use uuid::Uuid;
-
-use crate::ws_core::client::{GenericWebSocketManager, WebSocketClient};
+use websocket_trait::client::{GenericWebSocketManager, WebSocketClient};
 
 use super::connection::rkyv_websocket;
 use super::message::{Request, Response};
@@ -55,11 +54,3 @@ impl WebSocketClient for RkyvWebSocketClient {
 
 /// WebSocket manager with Rkyv encoding.
 pub type WebSocketManager = GenericWebSocketManager<RkyvWebSocketClient>;
-
-// Provide a convenient constructor for WebSocketManager
-impl WebSocketManager {
-    /// Creates a new WebSocket manager with a UUID.
-    pub fn new(uuid: Uuid) -> Self {
-        RkyvWebSocketClient::new(uuid).create_manager()
-    }
-}

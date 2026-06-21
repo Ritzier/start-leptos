@@ -10,9 +10,9 @@ pub async fn rkyv_websocket(
     input: BoxedStream<Request, ServerFnError>,
 ) -> Result<BoxedStream<Response, ServerFnError>, ServerFnError> {
     use futures::channel::mpsc;
+    use websocket_trait::server::GenericWebsocketBackend;
 
     use super::handler::RkyvWebSocketMessage;
-    use crate::ws_core::server::GenericWebsocketBackend;
 
     let (tx, rx) = mpsc::unbounded();
     let websocket_backend =

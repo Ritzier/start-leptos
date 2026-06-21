@@ -184,22 +184,14 @@ impl<T: WebSocketMessage> GenericWebsocketBackend<T> {
 
             // Error deserializing or receiving the message
             Some(Err(e)) => {
-                {%- if tracing == true %}
                 tracing::info!("Error receiving message: {e}");
-                {%- else %}
-                leptos::logging::log!("Error receiving message: {e}");
-                {%- endif %}
                 // Close connection on errors (could be network issue or bad data)
                 false
             }
 
             // Stream ended (client disconnected or connection lost)
             None => {
-                {%- if tracing == true %}
                 tracing::info!("Input stream closed");
-                {%- else %}
-                leptos::logging::log!("Input stream closed");
-                {%- endif %}
                 // Clean up and close connection
                 false
             }

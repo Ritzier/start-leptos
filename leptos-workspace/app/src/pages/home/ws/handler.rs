@@ -1,7 +1,6 @@
 use futures::channel::mpsc::UnboundedSender;
 use leptos::prelude::*;
-
-use crate::ws_core::server::{ResponseSender, WebSocketMessage};
+use websocket_trait::server::{ResponseSender, WebSocketMessage};
 
 use super::message::{Request, Response};
 

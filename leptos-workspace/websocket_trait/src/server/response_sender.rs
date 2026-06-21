@@ -74,11 +74,7 @@ pub trait ResponseSender<T> {
 impl<T> ResponseSender<T> for UnboundedSender<Result<T, ServerFnError>> {
     fn send_response(&self, response: T) -> bool {
         if let Err(e) = self.unbounded_send(Ok(response)) {
-            {%- if tracing == true %}
             tracing::warn!("Failed to send response to client: {e}");
-            {%- else %}
-            leptos::logging::warn!("Failed to send response to client: {e}");
-            {%- endif %}
             false
         } else {
             true

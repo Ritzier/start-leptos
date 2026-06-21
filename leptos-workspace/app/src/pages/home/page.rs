@@ -2,8 +2,9 @@
 use leptos::prelude::*;
 use leptos_router::{LazyRoute, lazy_route};
 use uuid::Uuid;
+use websocket_trait::client::WebSocketClient;
 
-use super::ws::WebSocketManager;
+use super::ws::{RkyvWebSocketClient, WebSocketManager};
 
 pub struct HomePage {
     websocket_manager: WebSocketManager,
@@ -13,7 +14,7 @@ pub struct HomePage {
 impl LazyRoute for HomePage {
     fn data() -> Self {
         let uuid = Uuid::new_v4();
-        let websocket_manager = WebSocketManager::new(uuid);
+        let websocket_manager = RkyvWebSocketClient::new(uuid).create_manager();
 
         Self { websocket_manager }
     }

@@ -10,6 +10,11 @@ leptos_router.workspace = true
 leptos_axum = { workspace = true, optional = true }
 {%- if websocket == true %}
 
+# Member Dependencies
+websocket_trait = { path = "../websocket_trait" }
+{%- endif %}
+{%- if websocket == true %}
+
 # Async runtime
 futures = { workspace = true }
 tokio = { workspace = true, optional = true }
@@ -35,6 +40,9 @@ ssr = [
   "leptos_meta/ssr",
   "leptos_router/ssr",
   "dep:leptos_axum",
+
+  # Member Dependencies
+  "websocket_trait/ssr",
 
   # Async runtime
   "dep:tokio",
