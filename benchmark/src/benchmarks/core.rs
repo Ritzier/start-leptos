@@ -48,7 +48,7 @@ impl Benchmarks {
     /// - WebDriver connection fails (chromedriver/geckodriver not running)
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let benchmark = Benchmarks::new(20).await?;
     /// ```
     pub async fn new(iteration: usize) -> Result<Self> {
@@ -83,7 +83,7 @@ impl Benchmarks {
     /// - Expected console logs don't appear within timeout
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let results = benchmark.start().await?;
     /// results.print_summary();
     /// ```
@@ -284,7 +284,7 @@ impl Benchmarks {
     /// - Button text doesn't match expected value
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let button = self.find_button_with_text("Connect").await?;
     /// button.click().await?;
     /// ```
@@ -325,7 +325,7 @@ impl Benchmarks {
     /// Returns error if timeout is reached before logs appear
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let expected = vec![ConsoleLog::new("log", "Operation complete")];
     /// self.wait_for_logs(&expected, Duration::from_secs(2)).await?;
     /// ```

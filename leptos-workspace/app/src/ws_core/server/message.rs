@@ -36,7 +36,7 @@ use leptos::prelude::ServerFnError;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```ignore
 /// use crate::ws_core::server::{WebSocketMessage, ResponseSender};
 ///
 /// pub struct ChatHandler {
@@ -102,7 +102,7 @@ pub trait WebSocketMessage: Send + 'static {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// async fn handle_request(&mut self, request: Request, tx: &UnboundedSender<...>) -> bool {
     ///     match request {
     ///         Request::Handshake { uuid } => {

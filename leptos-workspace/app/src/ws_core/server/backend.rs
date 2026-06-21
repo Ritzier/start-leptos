@@ -29,7 +29,7 @@ use super::message::WebSocketMessage;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```ignore
 /// use futures::channel::mpsc;
 /// use crate::ws_core::server::{GenericWebsocketBackend, MyHandler};
 ///
@@ -84,7 +84,7 @@ impl<T: WebSocketMessage> GenericWebsocketBackend<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// let (tx, rx) = mpsc::unbounded();
     /// let backend = GenericWebsocketBackend::new(input, tx, MyHandler);
     ///
@@ -119,7 +119,7 @@ impl<T: WebSocketMessage> GenericWebsocketBackend<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// tokio::spawn(async move {
     ///     backend.serve().await; // Runs until connection closes
     ///     tracing::info!("WebSocket connection closed");

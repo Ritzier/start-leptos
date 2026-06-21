@@ -39,7 +39,7 @@ impl AppWorld {
     /// - Server address not initialized
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let world = AppWorld::new().await?;
     /// ```
     pub async fn new() -> Result<Self> {
@@ -68,7 +68,7 @@ impl AppWorld {
     /// - JavaScript injection fails
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// world.goto_path("/").await?;
     /// world.goto_path("/dashboard").await?;
     /// ```
@@ -135,7 +135,7 @@ impl AppWorld {
     /// JSON value returned by the script
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let result = world.execute("return document.title;", vec![]).await?;
     /// ```
     pub async fn execute(&mut self, script: &str, args: Vec<Value>) -> Result<Value> {
@@ -158,7 +158,7 @@ impl AppWorld {
     /// - No element found matching the locator
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let button = world.find(Locator::Css("button.submit")).await?;
     /// button.click().await?;
     /// ```

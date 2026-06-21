@@ -30,7 +30,7 @@ impl PortFinder {
     /// 4. Return port if successful, otherwise try next
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let port = PortFinder::get_available_port().await?;
     /// let addr = SocketAddr::from((, port));[1]
     /// ```

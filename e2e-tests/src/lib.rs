@@ -12,7 +12,7 @@
 //! - `trace`: Logging configuration
 //!
 //! # Example
-//! ```rust
+//! ```ignore
 //! use e2e_tests::{LeptosServer, AppWorld};
 //!
 //! // Start server

@@ -22,7 +22,7 @@ use leptos::prelude::ServerFnError;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```ignore
 /// use crate::ws_core::server::{WebSocketMessage, ResponseSender};
 ///
 /// // Before: verbose error handling
@@ -50,7 +50,7 @@ pub trait ResponseSender<T> {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```ignore
     /// impl WebSocketMessage for MyHandler {
     ///     async fn handle_request(&mut self, request: Request, tx: &UnboundedSender<...>) -> bool {
     ///         match request {

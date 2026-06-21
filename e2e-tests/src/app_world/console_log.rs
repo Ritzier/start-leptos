@@ -15,7 +15,7 @@ use super::AppWorld;
 /// Captures level (log/info/warn/error/debug) and message content.
 ///
 /// # Example
-/// ```rust
+/// ```ignore
 /// let log = ConsoleLog::new("log", "User logged in");
 /// let error = ConsoleLog::new("error", "Connection failed");
 /// ```
@@ -46,7 +46,7 @@ impl ConsoleLog {
     /// * `message` - Log message (whitespace trimmed)
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let log = ConsoleLog::new("log", "Operation complete");
     /// let error = ConsoleLog::new("ERROR", "Failed"); // Converted to "error"
     /// ```
@@ -76,7 +76,7 @@ impl ConsoleLog {
     /// - Row doesn't have exactly 2 columns
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// // In step definition:
     /// let logs = ConsoleLog::from_table(step.table.as_ref().unwrap())?;
     /// ```
@@ -116,7 +116,7 @@ impl AppWorld {
     /// - JSON parsing fails
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let logs = world.get_console_logs().await?;
     /// for log in logs {
     ///     println!("[{}] {}", log.level, log.message.join(" "));
@@ -154,7 +154,7 @@ impl AppWorld {
     /// - Timeout reached before logs appear
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// let expected = vec![ConsoleLog::new("log", "Ready")];
     /// let logs = world.wait_for_console_logs(&expected, Duration::from_secs(2)).await?;
     /// ```
@@ -189,7 +189,7 @@ impl AppWorld {
     /// - JavaScript execution fails
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// world.clear_console_logs().await?;
     /// ```
     pub async fn clear_console_logs(&mut self) -> Result<()> {

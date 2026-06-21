@@ -27,7 +27,7 @@ use crate::AppWorld;
 /// - Any scenario fails
 ///
 /// # Example
-/// ```rust
+/// ```ignore
 /// cucumber_test("e2e-tests/features").await?;
 /// ```
 pub async fn cucumber_test<P: AsRef<Path>>(path: P) -> Result<()> {

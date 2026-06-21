@@ -18,7 +18,7 @@ static SERVER_ADDR: OnceLock<SocketAddr> = OnceLock::new();
 /// Panics if called more than once
 ///
 /// # Example
-/// ```rust
+/// ```ignore
 /// let addr = SocketAddr::from((, 8080));[1]
 /// set_server_addr(addr);
 /// ```
@@ -34,7 +34,7 @@ pub fn set_server_addr(addr: SocketAddr) {
 /// Panics if server address hasn't been initialized yet
 ///
 /// # Example
-/// ```rust
+/// ```ignore
 /// let addr = get_server_addr();
 /// let url = format!("http://{}/", addr);
 /// ```

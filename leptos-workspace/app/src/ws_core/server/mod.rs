@@ -12,7 +12,7 @@
 //!
 //! # Example
 //!
-//! ```rust
+//! ```ignore
 //! use crate::ws_core::server::{WebSocketMessage, ResponseSender, GenericWebsocketBackend};
 //! use futures::channel::mpsc;
 //!

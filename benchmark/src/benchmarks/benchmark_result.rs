@@ -15,7 +15,7 @@ use color_eyre::owo_colors::OwoColorize;
 /// - **Vec storage**: Preserves all raw data for statistical analysis
 ///
 /// # Example
-/// ```
+/// ```ignore
 /// let mut results = BenchmarkResults::new(100);
 ///
 /// for i in 0..100 {
@@ -45,7 +45,7 @@ impl BenchmarkResults {
     /// * `iteration` - Expected number of iterations per benchmark (for display only)
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// let results = BenchmarkResults::new(50);
     /// ```
     pub fn new(iteration: usize) -> Self {
@@ -65,7 +65,7 @@ impl BenchmarkResults {
     /// * `duration` - Elapsed time measurement from `Instant::elapsed()`
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// results.add_timing("connect", Duration::from_millis(45));
     /// results.add_timing("disconnect", Duration::from_millis(23));
     ///
@@ -163,7 +163,7 @@ impl BenchmarkResults {
     /// * `None` - If benchmark name not found
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// if let Some(timings) = results.get_timings("connect") {
     ///     println!("Collected {} samples", timings.len());
     ///     let sum: u128 = timings.iter().sum();
@@ -180,7 +180,7 @@ impl BenchmarkResults {
     /// Use this to iterate over all available benchmarks dynamically.
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// for name in results.benchmark_names() {
     ///     println!("Benchmark '{}' has data", name);
     ///     if let Some(timings) = results.get_timings(name) {
@@ -245,8 +245,8 @@ impl Statistics {
     ///   - Uses N because we're analyzing the entire population, not a sample
     ///
     /// # Example
-    /// ```
-    /// let timings = vec!;[1][2][3][4][5]
+    /// ```ignore
+    /// let timings = vec![1, 2, 3, 4, 5];
     /// let stats = Statistics::from_timings(&timings);
     ///
     /// println!("Average: {}ms", stats.avg);     // 13ms

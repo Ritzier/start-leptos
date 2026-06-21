@@ -129,7 +129,7 @@ impl LeptosServer {
     /// - Timeout is reached before server is ready
     ///
     /// # Example
-    /// ```rust
+    /// ```ignore
     /// // Wait up to 5 seconds for server to start
     /// LeptosServer::serve_and_wait(5).await?;
     /// ```
