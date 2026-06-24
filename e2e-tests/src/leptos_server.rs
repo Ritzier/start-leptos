@@ -108,7 +108,11 @@ impl LeptosServer {
             .to_str()
             .ok_or_else(|| eyre::eyre!("Invalid UTF-8 in Cargo.toml path"))?;
 
-        Server::cucumber_setup(addr, Some(cargo_toml_str), sender).await?;
+        // Create `Server`
+        let cucumber_server = Server::cucumber_new(addr, Some(cargo_toml_str), sender).await?;
+
+        // `Server` start serving
+        cucumber_server.serve().await?;
 
         Ok(())
     }

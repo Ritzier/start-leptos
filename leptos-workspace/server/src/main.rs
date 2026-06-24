@@ -13,11 +13,13 @@ async fn main() -> Result<(), color_eyre::Report> {
     #[cfg(debug_assertions)]
     Env::setup().await;
 
+    let server = Server::new().await?;
+
     let mut sigint = signal(SignalKind::interrupt()).map_err(color_eyre::Report::from)?;
     let mut sigterm = signal(SignalKind::terminate()).map_err(color_eyre::Report::from)?;
 
     tokio::select! {
-        result = Server::setup() => {
+        result = server.serve() => {
              if let Err(err) = result {
                 Err::<(), _>(color_eyre::Report::from(err))?;
             }

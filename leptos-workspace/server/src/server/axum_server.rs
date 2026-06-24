@@ -1,57 +1,53 @@
-use app::*;
+use std::net::SocketAddr;
+
+use app::{App, shell};
 use axum::Router;
 use leptos::prelude::*;
 use leptos_axum::{LeptosRoutes, generate_route_list};
+use tokio::net::TcpListener;
 
-use crate::Error;
+use super::errors::ServerError;
 
-pub struct Server;
+pub struct AxumServer {
+    listener: TcpListener,
+    app: Router,
+    addr: SocketAddr,
+}
 
-impl Server {
-    pub async fn setup() -> Result<(), Error> {
+impl AxumServer {
+    pub async fn new() -> Result<Self, ServerError> {
         let conf = get_configuration(None)?;
         let addr = conf.leptos_options.site_addr;
         let leptos_options = conf.leptos_options;
-        let routes = generate_route_list(App);
 
-        let app = Router::new()
-            .leptos_routes(&leptos_options, routes, {
-                let leptos_options = leptos_options.clone();
-                move || shell(leptos_options.clone())
-            })
-            .fallback(leptos_axum::file_and_error_handler(shell))
-            .with_state(leptos_options);
+        // build `router`
+        let app = Self::build_router(leptos_options)?;
 
         let listener = tokio::net::TcpListener::bind(&addr)
             .await
-            .map_err(|e| Error::AdressUsed { addr, source: e })?;
+            .map_err(|e| ServerError::AdressUsed { addr, source: e })?;
 
-        {% if tracing == true %}tracing::info!("Listening on: {addr:#?}");{% else %}println!("Listening on: {addr:#?}");{% endif %}
-
-        axum::serve(listener, app.into_make_service())
-            .await
-            .map_err(|e| Error::AdressUsed { addr, source: e })?;
-
-        Ok(())
+        Ok(Self {
+            listener,
+            app,
+            addr,
+        })
     }
     {%- if cucumber == true %}
 
     #[cfg(feature = "cucumber")]
-    pub async fn cucumber_setup(
-        addr: std::net::SocketAddr,
+    pub async fn cucumber_new(
+        addr: SocketAddr,
         cargo_toml_path: Option<&str>,
-        sender: tokio::sync::oneshot::Sender<()>,
-    ) -> Result<(), Error> {
+    ) -> Result<Self, ServerError> {
         let conf = get_configuration(cargo_toml_path)?;
-
         let leptos_options = conf.leptos_options;
-        let routes = generate_route_list(App);
 
         let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
             .nth(1)
             .ok_or_else(|| {
-                Error::Io(std::io::Error::new(
+                ServerError::Io(std::io::Error::new(
                     std::io::ErrorKind::NotFound,
                     "Failed to find parent directory of `CARGO_MANIFEST_DIR`",
                 ))
@@ -67,7 +63,25 @@ impl Server {
             tokio::fs::symlink(&wasm_file, &bg_wasm_file).await?;
         }
 
-        let app = Router::new()
+        // build `router`
+        let app = Self::build_router(leptos_options)?;
+
+        let listener = tokio::net::TcpListener::bind(&addr)
+            .await
+            .map_err(|e| ServerError::AdressUsed { addr, source: e })?;
+
+        Ok(Self {
+            listener,
+            app,
+            addr,
+        })
+    }
+    {%- endif %}
+
+    fn build_router(leptos_options: LeptosOptions) -> Result<Router, ServerError> {
+        let routes = generate_route_list(App);
+
+        let router = Router::new()
             .leptos_routes(&leptos_options, routes, {
                 let leptos_options = leptos_options.clone();
                 move || shell(leptos_options.clone())
@@ -75,20 +89,18 @@ impl Server {
             .fallback(leptos_axum::file_and_error_handler(shell))
             .with_state(leptos_options);
 
-        let listener = tokio::net::TcpListener::bind(&addr)
-            .await
-            .map_err(|e| Error::AdressUsed { addr, source: e })?;
+        Ok(router)
+    }
 
-        tracing::info!("Listening: {addr:?}");
-
-        // Signal that server is ready
-        let _ = sender.send(());
+    pub async fn serve(self) -> Result<(), ServerError> {
+        let Self {
+            listener,
+            app,
+            addr,
+        } = self;
 
         axum::serve(listener, app.into_make_service())
             .await
-            .map_err(|e| Error::AdressUsed { addr, source: e })?;
-
-        Ok(())
+            .map_err(|e| ServerError::AdressUsed { addr, source: e })
     }
-    {%- endif %}
 }
