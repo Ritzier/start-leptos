@@ -2,6 +2,7 @@
 //!
 //! Handles frontend compilation and server startup with readiness signaling.
 
+use std::net::SocketAddr;
 use std::path::Path;
 use std::process::Stdio;
 use std::time::Duration;
@@ -83,7 +84,7 @@ impl LeptosServer {
     /// - No available ports
     /// - Server fails to bind
     /// - Cargo.toml path invalid
-    async fn serve(sender: oneshot::Sender<()>) -> Result<()> {
+    async fn serve(sender: oneshot::Sender<()>, port: u16) -> Result<SocketAddr> {
         // Navigate to project root
         let manifest_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
             .ancestors()
@@ -91,10 +92,6 @@ impl LeptosServer {
             .ok_or_else(|| eyre::eyre!("Failed to find project root directory"))?;
         let cargo_toml_path = manifest_dir.join("Cargo.toml");
 
-        // Find an available port to avoid conflicts with other tests
-        let port = PortFinder::get_available_port()
-            .await
-            .map_err(|e| eyre::eyre!("{e}"))?;
         let addr = std::net::SocketAddr::new(
             std::net::IpAddr::V4(std::net::Ipv4Addr::new(127, 0, 0, 1)),
             port,
@@ -114,7 +111,7 @@ impl LeptosServer {
         // `Server` start serving
         cucumber_server.serve().await?;
 
-        Ok(())
+        Ok(addr)
     }
 
     /// Builds the frontend and starts the server, waiting for readiness.
@@ -138,6 +135,13 @@ impl LeptosServer {
     /// LeptosServer::serve_and_wait(5).await?;
     /// ```
     pub async fn serve_and_wait(timeout: u64) -> Result<()> {
+        tracing::info!("Starting server...");
+
+        // Find an available port to avoid conflicts with other tests
+        let port = PortFinder::get_available_port()
+            .await
+            .map_err(|e| eyre::eyre!("{e}"))?;
+
         // Step 1: Compile frontend WASM
         Self::compile_frontend().await?;
 
@@ -146,7 +150,7 @@ impl LeptosServer {
 
         // Step 3: Spawn server in background task
         let server_handle = tokio::spawn(async move {
-            if let Err(e) = Self::serve(tx).await {
+            if let Err(e) = Self::serve(tx, port).await {
                 eprintln!("Server error: {e}");
             }
         });
@@ -154,7 +158,7 @@ impl LeptosServer {
         // Step 4: Wait for server to be ready with timeout
         match tokio::time::timeout(Duration::from_secs(timeout), rx).await {
             Ok(Ok(())) => {
-                tracing::info!("Server is ready!");
+                tracing::info!("Server is listening on port: {port}!");
                 Ok(())
             }
             Ok(Err(_)) => {
