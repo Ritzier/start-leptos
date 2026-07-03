@@ -1,100 +1,68 @@
-//! WebDriver setup and lifecycle management.
+//! Utilities for launching and managing a local ChromeDriver instance.
 //!
-//! Supports both ChromeDriver and GeckoDriver with automatic selection.
+//! This module provides helpers for starting ChromeDriver and creating a
+//! connected Fantoccini WebDriver client.
 
-use std::env;
 use std::process::Stdio;
 
 use anyhow::{Result, anyhow};
 use fantoccini::wd::Capabilities;
 use fantoccini::{Client, ClientBuilder};
-use serde_json::json;
 use tokio::process::{Child, Command};
+use tokio::sync::OnceCell;
 
 use crate::PortFinder;
 
-/// WebDriver client with lifecycle management.
-///
-/// Automatically spawns and manages chromedriver or geckodriver process.
+/// Port assigned to the running `ChromeDriver` instance
+pub static CHROME_PORT: OnceCell<u16> = OnceCell::const_new();
+
+/// A WebDriver session backed by a local ChromeDriver process.
 #[derive(Debug)]
 pub struct Webdriver {
-    /// Fantoccini client for browser automation.
+    /// Fantoccini client used to control the browser.
     pub client: Client,
+}
 
-    /// Child process handle (chromedriver or geckodriver).
-    /// Kept alive until Webdriver is dropped.
-    #[expect(dead_code)]
+/// Handle to a spawned `ChromeDriver` process.
+pub struct ChromeDriverCommand {
     child: Child,
 }
 
 impl Webdriver {
-    /// Creates a new WebDriver instance.
+    /// Create a `WebDriver` session.
     ///
-    /// Selects driver based on `WEBDRIVER` environment variable:
-    /// - `chromedriver` or `chrome` → ChromeDriver (default)
-    /// - `geckodriver` or `gecko` → GeckoDriver
+    /// `spawn_chrome_driver()` must be called before this method so a
+    /// `ChromeDriver` instance is running and its port has been initialized.
+    ///
+    /// # Erros
+    ///
+    /// Returns an error if a `WebDriver` session cannot be establised.
+    pub async fn new() -> Result<Self> {
+        let client = Self::build_chromedriver().await?;
+
+        Ok(Self { client })
+    }
+
+    /// Connects to the running `ChromeDriver` instance.
+    ///
+    /// The `ChromeDriver` process must already be running, and
+    /// [`CHROME_PORT`] must have been initialized.
+    ///
+    /// The browser session is configured to:
+    /// - run in headless mode;
+    /// - enable browser logs;
+    /// - enable performance logs.
     ///
     /// # Errors
-    /// - Driver binary not found in PATH
-    /// - Driver fails to start
-    /// - Connection to driver fails
     ///
-    /// # Example
-    /// ```bash
-    /// # Use ChromeDriver (default)
-    /// cargo test
-    ///
-    /// # Use GeckoDriver
-    /// WEBDRIVER=geckodriver cargo test
-    /// ```
-    pub async fn new() -> Result<Self> {
-        let (client, child) = match env::var("WEBDRIVER") {
-            Err(_) => build_chromedriver().await?, // Default to Chrome
-            Ok(webdriver_env) => match webdriver_env.to_lowercase().as_str() {
-                "chromedriver" | "chrome" => build_chromedriver().await?,
-                "geckodriver" | "gecko" => build_geckodriver().await?,
-                invalid => return Err(anyhow!("Invalid WEBDRIVER value: `{invalid}`")),
-            },
-        };
+    /// Returns an error if the `ChromeDriver` port has not been initialized,
+    /// the session cannot be created, or the browser capabilities are invalid.
+    async fn build_chromedriver() -> Result<Client> {
+        let port = CHROME_PORT.get().ok_or(anyhow!("Port not initialize"))?;
 
-        Ok(Self { client, child })
-    }
-}
-
-/// Builds a ChromeDriver client.
-///
-/// # Process
-/// 1. Finds available port
-/// 2. Spawns chromedriver process
-/// 3. Waits 500ms for startup
-/// 4. Connects Fantoccini client
-///
-/// # Capabilities
-/// - Headless mode enabled
-/// - Browser and performance logging enabled
-///
-/// # Errors
-/// - chromedriver not in PATH
-/// - Port binding fails
-/// - Connection fails
-async fn build_chromedriver() -> Result<(Client, Child)> {
-    let port = PortFinder::get_available_port()
-        .await
-        .map_err(|e| anyhow!("{e}"))?;
-
-    // Spawn chromedriver process
-    let child = Command::new("chromedriver")
-        .arg(format!("--port={port}"))
-        .stdout(Stdio::null()) // Silence output
-        .stderr(Stdio::null())
-        .spawn()?;
-
-    // Wait for chromedriver to initialize
-    tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-
-    // Configure capabilities for Chrome
-    let cap: Capabilities = serde_json::from_str(
-        r#"{
+        // Configure capabilities for Chrome
+        let cap: Capabilities = serde_json::from_str(
+            r#"{
             "goog:loggingPrefs": {
                 "browser": "ALL",
                 "performance": "ALL"
@@ -104,56 +72,63 @@ async fn build_chromedriver() -> Result<(Client, Child)> {
                 "args": ["--headless"]
             }
         }"#,
-    )?;
+        )?;
 
-    // Connect Fantoccini client
-    let client = ClientBuilder::native()
-        .capabilities(cap)
-        .connect(&format!("http://localhost:{port}"))
-        .await?;
+        // Connect `Fantoccini` client
+        let client = ClientBuilder::native()
+            .capabilities(cap)
+            .connect(&format!("http://localhost:{port}"))
+            .await?;
 
-    Ok((client, child))
+        Ok(client)
+    }
+
+    /// Starts a `ChromeDriver` process on an available local port.
+    ///
+    /// The selected port is stored in [`CHROME_PORT`] for use by
+    /// [`Webdriver::new`].
+    ///
+    /// Returns a [`ChromeDriverCommand`] that can be used to terminated the
+    /// `ChromeDriver` process when it is no longer need.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an available port cannot be found or if
+    /// `ChromeDriver` fails to start.
+    pub async fn spawn_chrome_driver() -> Result<ChromeDriverCommand> {
+        let port = PortFinder::get_available_port()
+            .await
+            .map_err(|e| anyhow!("{e}"))?;
+
+        // Init to global
+        CHROME_PORT.get_or_init(|| async move { port }).await;
+
+        // Spawn chromedriver process
+        let child = Command::new("chromedriver")
+            .arg(format!("--port={port}"))
+            .stdout(Stdio::null()) // Silence output
+            .stderr(Stdio::null())
+            .spawn()?;
+
+        // Wait for chromedriver to initialize
+        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
+        tracing::info!(port = port, "ChromeDriver is ready and listening");
+
+        Ok(ChromeDriverCommand { child })
+    }
 }
 
-/// Builds a GeckoDriver client.
-///
-/// # Process
-/// 1. Finds available port
-/// 2. Spawns geckodriver process
-/// 3. Connects Fantoccini client
-///
-/// # Capabilities
-/// - Headless mode enabled with `-headless` flag
-///
-/// # Errors
-/// - geckodriver not in PATH
-/// - Port binding fails
-/// - Connection fails
-async fn build_geckodriver() -> Result<(Client, Child)> {
-    let port = PortFinder::get_available_port()
-        .await
-        .map_err(|e| anyhow!("{e}"))?;
+impl ChromeDriverCommand {
+    /// Terminates the `ChromeDriver` process and waits for it to exit.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the process cannot be terminated or waited on.
+    pub async fn shutdown(mut self) -> Result<()> {
+        self.child.kill().await?;
+        self.child.wait().await?;
 
-    // Spawn geckodriver process
-    let child = Command::new("geckodriver")
-        .arg(format!("--port={port}"))
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()?;
-
-    // Configure capabilities for Firefox
-    let mut caps = serde_json::Map::new();
-    caps.insert(
-        "moz:firefoxOptions".to_string(),
-        json!({ "args": ["--headless", "-headless"] }),
-    );
-
-    // Connect Fantoccini client
-    let webdriver_url = format!("http://localhost:{port}");
-    let client = ClientBuilder::native()
-        .capabilities(caps)
-        .connect(&webdriver_url)
-        .await?;
-
-    Ok((client, child))
+        Ok(())
+    }
 }

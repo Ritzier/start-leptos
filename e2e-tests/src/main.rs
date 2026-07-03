@@ -17,7 +17,7 @@
 //! - `WEBDRIVER`: Choose driver (`chromedriver` or `geckodriver`)
 //! - `RUST_LOG`: Set log level (e.g., `debug`, `info`)
 
-use e2e_tests::{LeptosServer, Trace, cucumber_test};
+use e2e_tests::{LeptosServer, Trace, Webdriver, cucumber_test};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -27,11 +27,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Setup tracing subscriber for logging
     Trace::setup();
 
+    // Spawn `ChromeDriver` process
+    let chrome_driver_command = Webdriver::spawn_chrome_driver().await?;
+
     // Compile frontend and start server (5 second timeout)
     LeptosServer::serve_and_wait(5).await?;
 
     // Run all feature files in e2e-tests/features/
     cucumber_test("e2e-tests/features").await?;
+
+    // Shut down `ChromeDriver`
+    chrome_driver_command.shutdown().await?;
 
     Ok(())
 }
