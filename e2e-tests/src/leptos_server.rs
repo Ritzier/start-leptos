@@ -143,7 +143,9 @@ impl LeptosServer {
             .map_err(|e| eyre::eyre!("{e}"))?;
 
         // Step 1: Compile frontend WASM
+        tracing::info!("Compiling Leptos frontend");
         Self::compile_frontend().await?;
+        tracing::info!("Leptos frontend compilation completed");
 
         // Step 2: Create oneshot channel for readiness signal
         let (tx, rx) = oneshot::channel();
