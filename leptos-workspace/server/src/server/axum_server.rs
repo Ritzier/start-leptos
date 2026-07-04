@@ -5,6 +5,7 @@ use axum::Router;
 use leptos::prelude::*;
 use leptos_axum::{LeptosRoutes, generate_route_list};
 use tokio::net::TcpListener;
+use tokio_util::sync::CancellationToken;
 
 use super::errors::ServerError;
 
@@ -12,10 +13,11 @@ pub struct AxumServer {
     listener: TcpListener,
     app: Router,
     addr: SocketAddr,
+    shutdown: CancellationToken,
 }
 
 impl AxumServer {
-    pub async fn new() -> Result<Self, ServerError> {
+    pub async fn new(shutdown: CancellationToken) -> Result<Self, ServerError> {
         let conf = get_configuration(None)?;
         let addr = conf.leptos_options.site_addr;
         let leptos_options = conf.leptos_options;
@@ -31,6 +33,7 @@ impl AxumServer {
             listener,
             app,
             addr,
+            shutdown,
         })
     }
     {%- if cucumber == true %}
@@ -39,6 +42,7 @@ impl AxumServer {
     pub async fn cucumber_new(
         addr: SocketAddr,
         cargo_toml_path: Option<&str>,
+        shutdown: CancellationToken,
     ) -> Result<Self, ServerError> {
         let conf = get_configuration(cargo_toml_path)?;
         let leptos_options = conf.leptos_options;
@@ -74,6 +78,7 @@ impl AxumServer {
             listener,
             app,
             addr,
+            shutdown,
         })
     }
     {%- endif %}
@@ -97,9 +102,14 @@ impl AxumServer {
             listener,
             app,
             addr,
+            shutdown,
         } = self;
 
         axum::serve(listener, app.into_make_service())
+            .with_graceful_shutdown(async move {
+                shutdown.cancelled().await;
+                tracing::info!("Axum shutting down");
+            })
             .await
             .map_err(|e| ServerError::AdressUsed { addr, source: e })
     }

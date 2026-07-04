@@ -5,6 +5,8 @@ mod debug;
 mod errors;
 #[cfg(feature = "ssr")]
 mod server;
+#[cfg(feature = "ssr")]
+mod shutdown_manager;
 {%- if tracing == true %}
 #[cfg(feature = "ssr")]
 mod trace;
@@ -17,6 +19,8 @@ pub use debug::Env;
 pub use errors::Error;
 #[cfg(feature = "ssr")]
 pub use server::Server;
+#[cfg(feature = "ssr")]
+pub use shutdown_manager::ShutdownManager;
 {%- if tracing == true %}
 #[cfg(feature = "ssr")]
 pub use trace::Trace;

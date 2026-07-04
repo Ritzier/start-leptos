@@ -11,6 +11,7 @@ use color_eyre::{Result, eyre};
 use server::Server;
 use tokio::process::Command;
 use tokio::sync::oneshot;
+use tokio_util::sync::CancellationToken;
 
 use crate::{PortFinder, set_server_addr};
 
@@ -105,8 +106,13 @@ impl LeptosServer {
             .to_str()
             .ok_or_else(|| eyre::eyre!("Invalid UTF-8 in Cargo.toml path"))?;
 
+        // Shutdown signal
+        // TODO:
+        let shutdown = CancellationToken::new();
+
         // Create `Server`
-        let cucumber_server = Server::cucumber_new(addr, Some(cargo_toml_str), sender).await?;
+        let cucumber_server =
+            Server::cucumber_new(addr, Some(cargo_toml_str), sender, shutdown.clone()).await?;
 
         // `Server` start serving
         cucumber_server.serve().await?;

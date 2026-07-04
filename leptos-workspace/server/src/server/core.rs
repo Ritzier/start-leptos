@@ -1,8 +1,14 @@
+use tokio::task::{JoinError, JoinSet};
+use tokio_util::sync::CancellationToken;
+
+use crate::Error;
+
 use super::axum_server::AxumServer;
 use super::errors::ServerError;
 
 pub struct Server {
     axum_server: AxumServer,
+    shutdown: CancellationToken,
 }
 {%- if cucumber == true %}
 
@@ -14,10 +20,13 @@ pub struct CucumberServer {
 {%- endif %}
 
 impl Server {
-    pub async fn new() -> Result<Self, ServerError> {
-        let axum_server = AxumServer::new().await?;
+    pub async fn new(shutdown: CancellationToken) -> Result<Self, ServerError> {
+        let axum_server = AxumServer::new(shutdown.clone()).await?;
 
-        Ok(Self { axum_server })
+        Ok(Self {
+            axum_server,
+            shutdown,
+        })
     }
     {%- if cucumber == true %}
 
@@ -26,26 +35,63 @@ impl Server {
         addr: std::net::SocketAddr,
         cargo_toml_path: Option<&str>,
         sender: tokio::sync::oneshot::Sender<()>,
+        shutdown: CancellationToken,
     ) -> Result<CucumberServer, ServerError> {
-        let axum_server = AxumServer::cucumber_new(addr, cargo_toml_path).await?;
+        let axum_server = AxumServer::cucumber_new(addr, cargo_toml_path, shutdown.clone()).await?;
 
-        let server = Server { axum_server };
+        let server = Server {
+            axum_server,
+            shutdown,
+        };
 
         Ok(CucumberServer { server, sender })
     }
     {%- endif %}
 
-    pub async fn serve(self) -> Result<(), ServerError> {
-        let Self { axum_server } = self;
+    pub async fn serve(self) -> Result<(), Error> {
+        self.run_server(|| async {}).await.map_err(Into::into)
+    }
 
-        // Axum task
-        let axum_handle = tokio::spawn(async move { axum_server.serve().await });
+    async fn run_server<F, Fut>(self, before_select: F) -> Result<(), ServerError>
+    where
+        F: FnOnce() -> Fut,
+        Fut: Future<Output = ()>,
+    {
+        let Self {
+            axum_server,
+            shutdown,
+        } = self;
+
+        let mut tasks = JoinSet::new();
+
+        tasks.spawn(axum_server.serve());
+
+        // hook (e.g. cucumber read signal)
+        before_select().await;
 
         tokio::select! {
-            res = axum_handle => res??,
+            _ = shutdown.cancelled() => {
+                tracing::info!("shutting down");
+            }
+
+            Some(res) = tasks.join_next() => {
+                Self::handle_result(res);
+            }
+        }
+
+        while let Some(res) = tasks.join_next().await {
+            Self::handle_result(res);
         }
 
         Ok(())
+    }
+
+    fn handle_result(result: Result<Result<(), ServerError>, JoinError>) {
+        match result {
+            Ok(Ok(())) => tracing::info!("Task exited"),
+            Ok(Err(err)) => tracing::error!("{err:#}"),
+            Err(join_err) => tracing::error!("Task panicked: {join_err:#}"),
+        }
     }
 }
 {%- if cucumber == true %}
@@ -55,21 +101,11 @@ impl CucumberServer {
     pub async fn serve(self) -> Result<(), ServerError> {
         let Self { server, sender } = self;
 
-        let Server { axum_server } = server;
-
-        // Axum task
-        let axum_handle = tokio::spawn(async move { axum_server.serve().await });
-
-        // ---- READY SIGNAL ----
-        let _ = sender.send(());
-
-        tokio::select! {
-            res = axum_handle => {
-                res??
-            }
-        }
-
-        Ok(())
+        server
+            .run_server(|| async move {
+                let _ = sender.send(());
+            })
+            .await
     }
 }
 {%- endif %}

@@ -16,6 +16,7 @@ tokio = { version = "1.47.0", features = [
   "rt-multi-thread",
   "process",
 ] }
+tokio-util = "0.7.18"
 
 # Cucumber BDD framework
 cucumber = "0.22.1"

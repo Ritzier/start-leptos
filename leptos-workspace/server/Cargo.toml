@@ -20,6 +20,7 @@ tokio = { workspace = true, features = [
   "rt-multi-thread",
   "signal",
 ], optional = true }
+tokio-util = { workspace = true, optional = true }
 
 # Better error handling
 color-eyre = { workspace = true, optional = true }
@@ -47,7 +48,10 @@ ssr = [
 
   # Server runtime
   "dep:axum",
+
+  # Async runtime
   "dep:tokio",
+  "dep:tokio-util",
 
   # Better error handling
   "dep:color-eyre",

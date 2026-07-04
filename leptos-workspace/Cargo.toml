@@ -41,6 +41,7 @@ axum = "0.8"
 
 # Async runtime
 tokio = { version = "1" }
+tokio-util = "0.7.18"
 {%- if websocket == true %}
 futures = "0.3"
 {%- endif %}
