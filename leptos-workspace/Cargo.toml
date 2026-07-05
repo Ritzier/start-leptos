@@ -33,10 +33,10 @@ leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8" }
 leptos_axum = { version = "0.8" }
 
-# WASM
+# WebAssembly
 wasm-bindgen = "0.2"
 
-# Server runtime
+# HTTP server
 axum = "0.8"
 
 # Async runtime
@@ -46,23 +46,39 @@ tokio-util = "0.7.18"
 futures = "0.3"
 {%- endif %}
 
-# Better error handling
+# Error handling
+anyhow = "1.0.103"
 color-eyre = "0.6"
 thiserror = "2"
 
 # Logging
 console_error_panic_hook = "0.1.7"
-
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 
 {%- if websocket == true %}
 
-# Codec
+# Binary serialization
 rkyv = "0.8"
 
-# Tools
+# Utilities
 uuid = "1.19"
+{%- endif %}
+
+{%- if cucumber == true %}
+
+# JSON serialization
+serde = "1.0.228"
+serde_json = "1.0.150"
+
+# Command-line interface
+clap = "4.6.1"
+
+# WebDriver client
+fantoccini = "0.22.1"
+
+# BDD testing
+cucumber = "0.23.0"
 {%- endif %}
 
 [[workspace.metadata.leptos]]

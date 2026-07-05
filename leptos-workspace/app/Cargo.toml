@@ -19,7 +19,7 @@ websocket_trait = { path = "../websocket_trait" }
 futures = { workspace = true }
 tokio = { workspace = true, optional = true }
 
-# Codec
+# Binary serialization
 rkyv = { workspace = true, features = ["uuid-1"] }
 
 # Tools
@@ -45,11 +45,8 @@ ssr = [
   # Async runtime
   "dep:tokio",
 
-  {%- if tracing == true %}
-
   # Logging
   "dep:tracing"
-  {%- endif %}
 ]
 {%- else %}
 hydrate = ["leptos/hydrate"]
