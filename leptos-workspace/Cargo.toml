@@ -53,12 +53,8 @@ thiserror = "2"
 # Logging
 console_error_panic_hook = "0.1.7"
 
-{%- if tracing == true or cucumber == true or websocket == true %}
 tracing = "0.1.44"
-{%- endif %}
-{%- if tracing == true %}
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
-{%- endif %}
 
 {%- if websocket == true %}
 

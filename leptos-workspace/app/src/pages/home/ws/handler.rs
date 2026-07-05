@@ -17,21 +17,13 @@ impl WebSocketMessage for RkyvWebSocketMessage {
     ) -> bool {
         match request {
             Request::Handshake { uuid } => {
-                {%- if tracing == true %}
                 tracing::info!("User connected: {uuid}");
-                {%- else %}
-                leptos::logging::log!("User connected: {uuid}");
-                {%- endif %}
                 tx.send_response(Response::HandshakeResponse);
 
                 true
             }
             Request::Disconnect { uuid } => {
-                {%- if tracing == true %}
                 tracing::info!("User disconnect: {uuid}");
-                {%- else %}
-                leptos::logging::log!("User disconnected: {uuid}");
-                {%- endif %}
                 false
             }
         }

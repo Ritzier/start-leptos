@@ -5,12 +5,6 @@ if websocket == false {
     file::delete("app/src/pages/home/ws");
 }
 
-// ===== Tracing =====
-let tracing = variable::get("tracing");
-if tracing == false {
-    file::delete("server/src/trace.rs");
-}
-
 // ===== Style =====
 let style = variable::get("style");
 

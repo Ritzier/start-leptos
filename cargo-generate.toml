@@ -5,7 +5,6 @@ ignore = ["README.md", "TODO.md", "template-test", "hooks"]
 
 [placeholders]
 websocket = { prompt = "Websocket?", default = false, type = "bool" }
-tracing = { prompt = "Tracing?", default = false, type = "bool" }
 style = { prompt = "Which style?", default = "default", type = "string", choices = [
   "default",
   "unocss",

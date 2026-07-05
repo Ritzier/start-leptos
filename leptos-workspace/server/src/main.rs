@@ -8,11 +8,9 @@ async fn main() -> Result<(), color_eyre::Report> {
     // Install color-eyre panic and error reporting
     color_eyre::install()?;
 
-    {% if tracing == true -%}
     // Initialize structured logging/tracing
     Trace::setup();
 
-    {% endif -%}
     // Load development environment variables when running in debug mode
     #[cfg(debug_assertions)]
     Env::setup().await;
