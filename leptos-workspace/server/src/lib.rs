@@ -8,6 +8,8 @@ mod server;
 #[cfg(feature = "ssr")]
 mod shutdown_manager;
 #[cfg(feature = "ssr")]
+mod task_supervisor;
+#[cfg(feature = "ssr")]
 mod trace;
 
 #[cfg(feature = "ssr")]
@@ -19,5 +21,7 @@ pub use errors::Error;
 pub use server::Server;
 #[cfg(feature = "ssr")]
 pub use shutdown_manager::ShutdownManager;
+#[cfg(feature = "ssr")]
+pub use task_supervisor::TaskSupervisor;
 #[cfg(feature = "ssr")]
 pub use trace::Trace;

@@ -1,7 +1,6 @@
-use tokio::task::{JoinError, JoinSet};
 use tokio_util::sync::CancellationToken;
 
-use crate::Error;
+use crate::{Error, TaskSupervisor};
 
 use super::axum_server::AxumServer;
 use super::errors::ServerError;
@@ -62,9 +61,9 @@ impl Server {
             shutdown,
         } = self;
 
-        let mut tasks = JoinSet::new();
+        let mut supervisor = TaskSupervisor::<ServerError>::new();
 
-        tasks.spawn(axum_server.serve());
+        supervisor.spawn(axum_server.serve());
 
         // hook (e.g. cucumber read signal)
         before_select().await;
@@ -74,24 +73,15 @@ impl Server {
                 tracing::info!("shutting down");
             }
 
-            Some(res) = tasks.join_next() => {
-                Self::handle_result(res);
+            Some(result) = supervisor.join_next() => {
+                shutdown.cancel();
+                TaskSupervisor::handle_result(result);
             }
         }
 
-        while let Some(res) = tasks.join_next().await {
-            Self::handle_result(res);
-        }
+        supervisor.drain().await;
 
         Ok(())
-    }
-
-    fn handle_result(result: Result<Result<(), ServerError>, JoinError>) {
-        match result {
-            Ok(Ok(())) => tracing::info!("Task exited"),
-            Ok(Err(err)) => tracing::error!("{err:#}"),
-            Err(join_err) => tracing::error!("Task panicked: {join_err:#}"),
-        }
     }
 }
 {%- if cucumber == true %}

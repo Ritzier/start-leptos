@@ -3,7 +3,6 @@
 async fn main() -> Result<(), color_eyre::Report> {
     use server::*;
     use tokio::signal::unix::{SignalKind, signal};
-    use tokio::task::JoinSet;
 
     // Install color-eyre panic and error reporting
     color_eyre::install()?;
@@ -20,9 +19,8 @@ async fn main() -> Result<(), color_eyre::Report> {
     // Build and configure the application server
     let server = Server::new(shutdown_manager.child()).await?;
 
-    let mut tasks = JoinSet::new();
-
-    tasks.spawn(server.serve());
+    let mut supervisor = TaskSupervisor::<Error>::new();
+    supervisor.spawn(server.serve());
 
     // Listen for common `Unix` shutdown signals
     let mut sigint = signal(SignalKind::interrupt()).map_err(color_eyre::Report::from)?;
@@ -42,26 +40,15 @@ async fn main() -> Result<(), color_eyre::Report> {
             shutdown_manager.shutdown();
         }
 
-        Some(res) = tasks.join_next() => {
+        Some(result) = supervisor.join_next() => {
             shutdown_manager.shutdown();
-            handle_result(res);
+            TaskSupervisor::handle_result(result);
         }
     }
 
-    while let Some(res) = tasks.join_next().await {
-        handle_result(res);
-    }
+    supervisor.drain().await;
 
     Ok(())
-}
-
-#[cfg(feature = "ssr")]
-fn handle_result(result: Result<Result<(), server::Error>, tokio::task::JoinError>) {
-    match result {
-        Ok(Ok(())) => tracing::info!("Task exited"),
-        Ok(Err(err)) => tracing::error!("{err:#}"),
-        Err(join_err) => tracing::error!("Task panicked: {join_err:#}"),
-    }
 }
 
 #[cfg(not(feature = "ssr"))]
