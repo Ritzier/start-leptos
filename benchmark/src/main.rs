@@ -25,9 +25,10 @@
 //! - Median (50th percentile)
 //! - Standard deviation (consistency measure)
 
-use benchmark::{Benchmarks, Cli};
+use benchmark::{Benchmarks, Cli, Error};
 use clap::Parser;
 use color_eyre::Result;
+use e2e_tests::Webdriver;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -37,6 +38,11 @@ async fn main() -> Result<()> {
     // Parse command-line arguments
     let Cli { iteration } = Cli::parse();
 
+    // Spawn `ChromeDriver` command
+    let chrome_driver = Webdriver::spawn_chrome_driver()
+        .await
+        .map_err(Error::from)?;
+
     // Initialize benchmark runner (starts server, connects WebDriver)
     let benchmark = Benchmarks::new(iteration).await?;
 
@@ -45,6 +51,9 @@ async fn main() -> Result<()> {
 
     // Print colorized statistical summary
     results.print_summary();
+
+    // Shutdown `ChromeDriver`
+    chrome_driver.shutdown().await.map_err(Error::from)?;
 
     Ok(())
 }

@@ -7,6 +7,8 @@
 //! # Architecture
 //! - `cli`: Command-line argument parsing
 //! - `benchmarks`: Core benchmark logic and results tracking
+mod errors;
+pub use errors::Error;
 
 mod cli;
 pub use cli::Cli;
