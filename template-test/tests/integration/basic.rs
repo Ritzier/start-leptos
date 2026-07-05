@@ -17,7 +17,6 @@ template_test!(
     all_feature_template,
     CargoGenerate {
         websocket: true,
-        tracing: true,
         style: Style::Unocss,
         docker: true,
         cucumber: true,
@@ -29,14 +28,6 @@ template_test!(
     websocket_only,
     CargoGenerate {
         websocket: true,
-        ..Default::default()
-    }
-);
-
-template_test!(
-    tracing_only,
-    CargoGenerate {
-        tracing: true,
         ..Default::default()
     }
 );

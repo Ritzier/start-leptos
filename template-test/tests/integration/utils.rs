@@ -14,7 +14,6 @@ pub use generate_result::GenerateResult;
 #[derive(Debug, Default)]
 pub struct CargoGenerate {
     pub websocket: bool,
-    pub tracing: bool,
     pub style: Style,
     pub docker: bool,
     pub cucumber: bool,
@@ -44,7 +43,6 @@ impl CargoGenerate {
         eprintln!("{self:#?}");
         let Self {
             websocket,
-            tracing,
             style,
             docker,
             cucumber,
@@ -71,8 +69,6 @@ impl CargoGenerate {
                 "websocket={}",
                 websocket.to_string().to_lowercase()
             ))
-            .arg("-d")
-            .arg(format!("tracing={}", tracing.to_string().to_lowercase()))
             .arg("-d")
             .arg(format!("style={}", style))
             .arg("-d")
