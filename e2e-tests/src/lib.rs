@@ -33,8 +33,8 @@ mod trace;
 pub use trace::Trace;
 
 mod utils;
-pub use utils::Webdriver;
-use utils::{PortFinder, get_server_addr, set_server_addr};
+pub use utils::ChromeDriver;
+use utils::{PortFinder, WebDriver, get_server_addr, set_server_addr};
 
 mod run;
 pub use run::cucumber_test;

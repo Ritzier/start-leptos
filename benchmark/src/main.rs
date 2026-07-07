@@ -28,7 +28,7 @@
 use benchmark::{Benchmarks, Cli, Error};
 use clap::Parser;
 use color_eyre::Result;
-use e2e_tests::Webdriver;
+use e2e_tests::ChromeDriver;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -39,9 +39,7 @@ async fn main() -> Result<()> {
     let Cli { iteration } = Cli::parse();
 
     // Spawn `ChromeDriver` command
-    let chrome_driver = Webdriver::spawn_chrome_driver()
-        .await
-        .map_err(Error::from)?;
+    let chrome_driver = ChromeDriver::new().await.map_err(Error::from)?;
 
     // Initialize benchmark runner (starts server, connects WebDriver)
     let benchmark = Benchmarks::new(iteration).await?;

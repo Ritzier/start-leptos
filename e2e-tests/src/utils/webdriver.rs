@@ -3,32 +3,20 @@
 //! This module provides helpers for starting ChromeDriver and creating a
 //! connected Fantoccini WebDriver client.
 
-use std::process::Stdio;
-
 use anyhow::{Result, anyhow};
 use fantoccini::wd::Capabilities;
 use fantoccini::{Client, ClientBuilder};
-use tokio::process::{Child, Command};
-use tokio::sync::OnceCell;
 
-use crate::PortFinder;
-
-/// Port assigned to the running `ChromeDriver` instance
-pub static CHROME_PORT: OnceCell<u16> = OnceCell::const_new();
+use super::chrome_driver::CHROME_PORT;
 
 /// A WebDriver session backed by a local ChromeDriver process.
 #[derive(Debug)]
-pub struct Webdriver {
+pub struct WebDriver {
     /// Fantoccini client used to control the browser.
     pub client: Client,
 }
 
-/// Handle to a spawned `ChromeDriver` process.
-pub struct ChromeDriverCommand {
-    child: Child,
-}
-
-impl Webdriver {
+impl WebDriver {
     /// Create a `WebDriver` session.
     ///
     /// `spawn_chrome_driver()` must be called before this method so a
@@ -81,54 +69,5 @@ impl Webdriver {
             .await?;
 
         Ok(client)
-    }
-
-    /// Starts a `ChromeDriver` process on an available local port.
-    ///
-    /// The selected port is stored in [`CHROME_PORT`] for use by
-    /// [`Webdriver::new`].
-    ///
-    /// Returns a [`ChromeDriverCommand`] that can be used to terminated the
-    /// `ChromeDriver` process when it is no longer need.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if an available port cannot be found or if
-    /// `ChromeDriver` fails to start.
-    pub async fn spawn_chrome_driver() -> Result<ChromeDriverCommand> {
-        let port = PortFinder::get_available_port()
-            .await
-            .map_err(|e| anyhow!("{e}"))?;
-
-        // Init to global
-        CHROME_PORT.get_or_init(|| async move { port }).await;
-
-        // Spawn chromedriver process
-        let child = Command::new("chromedriver")
-            .arg(format!("--port={port}"))
-            .stdout(Stdio::null()) // Silence output
-            .stderr(Stdio::null())
-            .spawn()?;
-
-        // Wait for chromedriver to initialize
-        tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-
-        tracing::info!(port = port, "ChromeDriver is ready and listening");
-
-        Ok(ChromeDriverCommand { child })
-    }
-}
-
-impl ChromeDriverCommand {
-    /// Terminates the `ChromeDriver` process and waits for it to exit.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the process cannot be terminated or waited on.
-    pub async fn shutdown(mut self) -> Result<()> {
-        self.child.kill().await?;
-        self.child.wait().await?;
-
-        Ok(())
     }
 }

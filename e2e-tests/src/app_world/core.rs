@@ -10,7 +10,7 @@ use fantoccini::Locator;
 use fantoccini::elements::Element;
 use serde_json::Value;
 
-use crate::{Webdriver, get_server_addr};
+use crate::{WebDriver, get_server_addr};
 
 /// Cucumber World for browser-based testing.
 ///
@@ -22,7 +22,7 @@ use crate::{Webdriver, get_server_addr};
 #[world(init = Self::new)]
 pub struct AppWorld {
     /// WebDriver client for browser automation.
-    pub webdriver: Webdriver,
+    pub webdriver: WebDriver,
 
     /// Server address (set by `LeptosServer::serve_and_wait`).
     addr: SocketAddr,
@@ -43,7 +43,7 @@ impl AppWorld {
     /// let world = AppWorld::new().await?;
     /// ```
     pub async fn new() -> Result<Self> {
-        let webdriver = Webdriver::new().await?;
+        let webdriver = WebDriver::new().await?;
         let addr = get_server_addr();
 
         Ok(Self { webdriver, addr })
