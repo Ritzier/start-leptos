@@ -30,14 +30,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Spawn `ChromeDriver` process
     let chrome_driver_command = Webdriver::spawn_chrome_driver().await?;
 
-    // Compile frontend and start server (5 second timeout)
-    LeptosServer::serve_and_wait(5).await?;
+    let test_result: color_eyre::Result<()> = async {
+        // Compile frontend and start server (5 second timeout)
+        LeptosServer::serve_and_wait(5).await?;
 
-    // Run all feature files in e2e-tests/features/
-    cucumber_test("e2e-tests/features").await?;
+        // Run all feature files in e2e-tests/features/
+        cucumber_test("e2e-tests/features").await?;
+        Ok(())
+    }
+    .await;
 
     // Shut down `ChromeDriver`
     chrome_driver_command.shutdown().await?;
+
+    // Propagate any error from the test run
+    test_result?;
 
     Ok(())
 }
