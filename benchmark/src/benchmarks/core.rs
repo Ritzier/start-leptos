@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use color_eyre::owo_colors::OwoColorize;
 use color_eyre::{Result, eyre::eyre};
-use e2e_tests::{AppWorld, ConsoleLog, LeptosServer};
+use e2e_tests::{AppWorld, ConsoleLog};
 use fantoccini::Locator;
 use tokio::time::Instant;
 
@@ -11,20 +11,21 @@ use super::benchmark_result::BenchmarkResults;
 /// Core benchmark runner that measures application performance.
 ///
 /// This struct manages the benchmark lifecycle:
-/// 1. Starts the Leptos server
-/// 2. Connects WebDriver browser automation
-/// 3. Runs specified number of iterations
-/// 4. Collects timing data
-/// 5. Returns statistical results
+/// 1. Initializes the test `AppWorld` (which starts the Leptos server and
+///    connects `WebDriver` browser automation)
+/// 2. Runs specified number of iterations
+/// 3. Collects timing data
+/// 4. Returns statistical results
 ///
 /// # Benchmark Types
 /// - **WebSocket mode**: Measures connect/disconnect handshake timings
 /// - **Default mode**: Measures button click and state update latency
 pub struct Benchmarks {
-    /// WebDriver instance for browser automation.
+    /// Test world providing `WebDriver` browser automation and the backing
+    /// `Leptos` server for this benchmark run.
     /// Provides methods to find elements, click buttons, and verify console logs.
     app_world: AppWorld,
-    
+
     /// Number of iterations to run for each benchmark.
     /// Higher values provide more accurate statistical analysis.
     iteration: usize,
@@ -34,10 +35,9 @@ impl Benchmarks {
     /// Initializes the benchmark environment.
     ///
     /// This method:
-    /// 1. Compiles the frontend WASM if needed
-    /// 2. Starts the Leptos server on an available port
-    /// 3. Connects WebDriver (chromedriver or geckodriver)
-    /// 4. Waits for server to be ready (5 second timeout)
+    /// 1. Compiles the frontend WASM
+    /// 2. Starts the `Leptos` serevr on an available port and waits for readiness
+    /// 3. Connects `WebDriver`
     ///
     /// # Arguments
     /// * `iteration` - Number of times to run each benchmark
@@ -45,17 +45,16 @@ impl Benchmarks {
     /// # Errors
     /// - Frontend compilation fails
     /// - Server fails to start within timeout
-    /// - WebDriver connection fails (chromedriver/geckodriver not running)
+    /// - `WebDriver` connection fails (`ChromeDriver` not running)
     ///
     /// # Example
     /// ```ignore
     /// let benchmark = Benchmarks::new(20).await?;
     /// ```
     pub async fn new(iteration: usize) -> Result<Self> {
-        // Start server and wait for it to be ready
-        LeptosServer::serve_and_wait(5).await?;
-        
-        // Connect WebDriver browser automation
+        // `AppWorld::new` now owns the full setup: it starts the `Leptos`
+        // server (compile + bind + readiness wait) and connects `WebDriver`,
+        // so no separate server startup in needed here.
         let app_world = AppWorld::new().await.map_err(|e| eyre!(e))?;
 
         Ok(Self {
@@ -99,10 +98,10 @@ impl Benchmarks {
                 "\n{}",
                 format!("=== Iteration {}/{} ===", i, self.iteration).cyan()
             );
-            
+
             {% if websocket == true -%}
             // WebSocket mode: measure connect and disconnect operations
-            
+
             // Benchmark connect: Click button -> Wait for handshake -> Record time
             let connect_time = self.benchmark_connect().await?;
             results.add_timing("connect", connect_time);
@@ -142,7 +141,7 @@ impl Benchmarks {
             .await
             .map_err(|e| eyre!("Failed to navigate to /: {e}"))
     }
-    
+
     {% if websocket == true -%}
     /// Benchmarks the WebSocket connect operation.
     ///

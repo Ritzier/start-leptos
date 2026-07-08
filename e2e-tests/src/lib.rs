@@ -34,7 +34,7 @@ pub use trace::Trace;
 
 mod utils;
 pub use utils::ChromeDriver;
-use utils::{PortFinder, WebDriver, get_server_addr, set_server_addr};
+use utils::{PortFinder, WebDriver};
 
 mod run;
 pub use run::cucumber_test;

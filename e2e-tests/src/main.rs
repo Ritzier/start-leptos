@@ -9,15 +9,10 @@
 //! ```bash
 //! cargo run --bin cucumber
 //!
-//! # With specific WebDriver
-//! WEBDRIVER=geckodriver cargo run --bin cucumber
-//! ```
-//!
 //! # Environment Variables
-//! - `WEBDRIVER`: Choose driver (`chromedriver` or `geckodriver`)
 //! - `RUST_LOG`: Set log level (e.g., `debug`, `info`)
 
-use e2e_tests::{ChromeDriver, LeptosServer, Trace, cucumber_test};
+use e2e_tests::{ChromeDriver, Trace, cucumber_test};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -31,10 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let chrome_driver = ChromeDriver::new().await?;
 
     let result: color_eyre::Result<()> = async {
-        // Compile frontend and start server (5 second timeout)
-        LeptosServer::serve_and_wait(5).await?;
-
-        // Run all feature files in e2e-tests/features/
+        // Run all feature files in `e2e-tests/features/` folder
         cucumber_test("e2e-tests/features").await?;
         Ok(())
     }
