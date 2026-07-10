@@ -12,10 +12,12 @@
 //! # Environment Variables
 //! - `RUST_LOG`: Set log level (e.g., `debug`, `info`)
 
+use color_eyre::Result;
+use color_eyre::eyre::eyre;
 use e2e_tests::{ChromeDriver, Trace, cucumber_test};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     // Install color-eyre for beautiful error messages
     color_eyre::install()?;
 
@@ -23,9 +25,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Trace::setup();
 
     // Spawn `ChromeDriver` process
-    let chrome_driver = ChromeDriver::new().await?;
+    let chrome_driver = ChromeDriver::new().await.map_err(|e| eyre!("{e:?}"))?;
 
-    let result: color_eyre::Result<()> = async {
+    let result: Result<()> = async {
         // Run all feature files in `e2e-tests/features/` folder
         cucumber_test("e2e-tests/features").await?;
         Ok(())
@@ -33,7 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .await;
 
     // Shut down `ChromeDriver`
-    chrome_driver.shutdown().await?;
+    chrome_driver.shutdown().await.map_err(|e| eyre!("{e:?}"))?;
 
     // Propagate any error from the test run
     result?;
