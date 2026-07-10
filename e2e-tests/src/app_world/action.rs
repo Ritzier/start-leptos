@@ -123,7 +123,7 @@ pub async fn check_button_label(world: &mut AppWorld, expected_label: String) ->
 /// ```
 ///
 /// # Notes
-/// - Waits up to 1 second for logs to appear
+/// - Waits up to 3 second for logs to appear
 /// - Clears logs after validation for next step
 #[then("I should see the following console logs:")]
 pub async fn check_console_logs_table(
@@ -136,12 +136,10 @@ pub async fn check_console_logs_table(
         .ok_or_else(|| anyhow::Error::msg("Expected data table"))?;
     let expected_console_log = ConsoleLog::from_table(table)?;
 
-    // Wait for logs to appear (1 second timeout)
-    let logs = world
-        .wait_for_console_logs(&expected_console_log, Duration::from_secs(5))
+    // Wait for logs to appear
+    world
+        .wait_for_console_logs(&expected_console_log, Duration::from_secs(3))
         .await?;
-
-    assert_eq!(expected_console_log, logs);
 
     // Clear logs for next step
     world.clear_console_logs().await?;

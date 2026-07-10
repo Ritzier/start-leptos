@@ -137,47 +137,61 @@ impl AppWorld {
         Ok(logs)
     }
 
-    /// Waits for expected console logs to appear.
+    /// Waits until the browser console logs match the expected logs.
     ///
-    /// Polls the browser every 10ms until either:
-    /// - Expected logs match exactly
-    /// - Timeout is reached
+    /// Polls the browser at a fixed interval (`timeout_dur / 5`) until either:
+    /// - The console logs match the expected logs exactly
+    /// - The maximum number of polling attempts is reached
     ///
     /// # Arguments
-    /// * `expected` - Slice of expected console logs
-    /// * `timeout_dur` - Maximum duration to wait
+    /// * `expected` - Expected console logs to match
+    /// * `timeout_dur` - Maximum duration to wait before returning an error
     ///
     /// # Returns
-    /// The matched console logs
+    /// `Ok(())` when the expected logs are observed.
     ///
     /// # Errors
-    /// - Timeout reached before logs appear
+    /// Returns an error when:
+    /// - The expected console logs do not appear before the timeout
+    /// - Retrieving browser console logs fails
+    ///
+    /// The timeout error includes both the expected logs and the latest
+    /// console logs observed from the browser for easier debugging.
     ///
     /// # Example
     /// ```ignore
     /// let expected = vec![ConsoleLog::new("log", "Ready")];
-    /// let logs = world.wait_for_console_logs(&expected, Duration::from_secs(2)).await?;
+    /// world
+    ///     .wait_for_console_logs(&expected, Duration::from_secs(2))
+    ///     .await?;
     /// ```
     pub async fn wait_for_console_logs(
         &mut self,
         expected: &[ConsoleLog],
         timeout_dur: Duration,
-    ) -> Result<Vec<ConsoleLog>> {
-        tokio::time::timeout(timeout_dur, async {
-            loop {
-                let logs = self.get_console_logs().await?;
+    ) -> Result<()> {
+        let tick_duration = timeout_dur / 5;
+        let mut latest_logs = Vec::new();
 
-                // Check if logs match expected
-                if logs.as_slice() == expected {
-                    return Ok(logs);
-                }
+        for _ in 0..5 {
+            let logs = self.get_console_logs().await?;
 
-                // Wait 10ms before checking again
-                tokio::time::sleep(Duration::from_millis(10)).await;
+            if logs.as_slice() == expected {
+                return Ok(());
             }
-        })
-        .await
-        .map_err(|_| anyhow::Error::msg("Timed out waiting for expected console logs"))?
+
+            latest_logs = logs;
+
+            tokio::time::sleep(tick_duration).await;
+        }
+
+        Err(anyhow::anyhow!(
+            "Timed out waiting for expected console logs\n\n\
+         Expected:\n{:#?}\n\n\
+         Latest actual logs:\n{:#?}",
+            expected,
+            latest_logs
+        ))
     }
 
     /// Clears all captured console logs.
