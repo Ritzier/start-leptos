@@ -5,8 +5,8 @@
 use std::ffi::OsStr;
 use std::path::Path;
 
-use color_eyre::eyre::Result;
-use cucumber::World;
+use color_eyre::eyre::{Result, eyre};
+use cucumber::{StatsWriter, World, writer};
 use tokio::fs;
 
 use crate::AppWorld;
@@ -39,10 +39,15 @@ pub async fn cucumber_test<P: AsRef<Path>>(path: P) -> Result<()> {
 
         // Only process .feature files
         if path.extension() == Some(OsStr::new("feature")) {
-            AppWorld::cucumber()
-                .fail_on_skipped() // Treat skipped tests as failures
-                .run_and_exit(path) // Run and exit with appropriate code
+            let writer = AppWorld::cucumber()
+                .fail_on_skipped()
+                .with_writer(writer::Summarize::new(writer::Basic::stdout()))
+                .run(&path)
                 .await;
+
+            if writer.execution_has_failed() {
+                return Err(eyre!("cucumber test failed for {path:?}"));
+            }
         }
     }
 
