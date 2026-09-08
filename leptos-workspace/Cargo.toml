@@ -6,7 +6,7 @@ members = ["app", "frontend", "server"{% if websocket == true %}, "websocket_tra
 opt-level = 0
 debug = 1
 incremental = true
-codegen-units = 1024
+codegen-units = 32
 
 [profile.release]
 lto = true
