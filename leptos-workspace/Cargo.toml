@@ -34,7 +34,7 @@ leptos_router = { version = "0.8" }
 leptos_axum = { version = "0.8" }
 
 # WebAssembly
-wasm-bindgen = "0.2"
+wasm-bindgen = "=0.2.127"
 
 # HTTP server
 axum = "0.8"
