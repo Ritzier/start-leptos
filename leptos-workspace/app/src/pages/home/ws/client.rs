@@ -36,7 +36,7 @@ impl WebSocketClient for RkyvWebSocketClient {
         }
     }
 
-    fn handle_response(response: Self::Response, is_connected: RwSignal<bool>) {
+    fn handle_response(&self, response: Self::Response, is_connected: RwSignal<bool>) {
         match response {
             Response::HandshakeResponse => {
                 is_connected.set(true);

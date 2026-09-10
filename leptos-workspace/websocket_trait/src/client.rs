@@ -23,6 +23,8 @@
 //! manager.connect();
 //! ```
 
+use std::sync::Arc;
+
 use futures::StreamExt;
 use futures::channel::mpsc::{self, UnboundedSender};
 use leptos::prelude::*;
@@ -133,7 +135,7 @@ pub trait WebSocketClient: Clone + 'static {
     ///     }
     /// }
     /// ```
-    fn handle_response(response: Self::Response, is_connected: RwSignal<bool>);
+    fn handle_response(&self, response: Self::Response, is_connected: RwSignal<bool>);
 
     /// Get the WebSocket stream from the server.
     ///
@@ -203,7 +205,7 @@ pub struct GenericWebSocketManager<T: WebSocketClient> {
     /// The client implementation defining message types and handlers.
     ///
     /// Contains the business logic for creating requests and handling responses.
-    client: T,
+    client: Arc<T>,
 }
 
 impl<T: WebSocketClient> GenericWebSocketManager<T> {
@@ -224,7 +226,7 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
         Self {
             tx: StoredValue::new(None),
             is_connected: RwSignal::new(false),
-            client,
+            client: Arc::new(client),
         }
     }
 
@@ -265,6 +267,8 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
         self.tx.set_value(Some(tx));
         let is_connected = self.is_connected;
 
+        let client = self.client.clone();
+
         // Spawn async task to handle incoming responses
         leptos::task::spawn_local(async move {
             // Establish WebSocket stream via server function
@@ -300,7 +304,7 @@ impl<T: WebSocketClient> GenericWebSocketManager<T> {
                 };
 
                 // Delegate response handling to client implementation
-                T::handle_response(response, is_connected);
+                client.handle_response(response, is_connected);
             }
         });
     }
