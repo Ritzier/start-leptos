@@ -6,8 +6,9 @@ ignore = ["README.md", "TODO.md", "template-test", "hooks"]
 [placeholders]
 websocket = { prompt = "Websocket?", default = false, type = "bool" }
 style = { prompt = "Which style?", default = "default", type = "string", choices = [
-  "default",
-  "unocss",
+    "default",
+    "unocss",
+    "tailwind",
 ] }
 docker = { prompt = "Docker?", default = false, type = "bool" }
 cucumber = { prompt = "Cucumber?", default = false, type = "bool" }

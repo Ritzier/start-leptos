@@ -24,10 +24,10 @@ cargo generate ritzier/start-leptos
 
 - **Websocket?** (default: false) - Enable real-time **Websocket** communication with `rkyv`
 - **Tracing?** (default: false) - Add structed logging with `tracing`
-- **Style?**: Choices: `default`, `unocss` (default: `default`)
+- **Style?**: Choices: `default`, `unocss`, `tailwind` (default: `default`)
 - **Docker?** (default: false) - Include **Docker** setup with multi-stage builds
 - **Cucumber?** (default: false) - Add BDD end-to-end testing
-  - **Benchmark?** (default: false) - Add performance benchmarking
+    - **Benchmark?** (default: false) - Add performance benchmarking
 
 ### Commands
 
@@ -286,10 +286,10 @@ Enable structured logging with `tracing` and `tracing-subscriber` for better obs
 - **Default**: Uses Leptos built-in CSS bundling (`/pkg/{{project-name}}.css`)
 
 - **UnoCSS**: Atomic CSS engine with:
-  - Auto pattern scanning from `src/**/*.rs` (Project) or `app/**/*.rs` (Workspace)
-  - Output to `public/uno.css`
-  - `npm run watch` for development HMR
-  - `npm run build` for production minification
+    - Auto pattern scanning from `src/**/*.rs` (Project) or `app/**/*.rs` (Workspace)
+    - Output to `public/uno.css`
+    - `npm run watch` for development HMR
+    - `npm run build` for production minification
 
 ## Testing && Benchmarking
 

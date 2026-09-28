@@ -4,7 +4,7 @@ export default defineConfig({
   cli: {
     entry: {
       patterns: ["app/**/*.rs"],
-      outFile: "public/uno.css",
+      outFile: "public/style.css",
     },
   },
   presets: [presetMini()],

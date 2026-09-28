@@ -88,7 +88,7 @@ output-name = "{{project-name}}"
 bin-package = "server"
 lib-package = "frontend"
 
-style-file = "style/main.scss"
+{% if style == "default" %}{%else%}# {% endif %}style-file = "style/main.scss"
 # tailwind-input-file = "style/tailwind.css"
 
 site-root = "target/site"
