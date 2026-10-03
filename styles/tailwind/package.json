@@ -5,6 +5,8 @@
         "tailwindcss": "^4.3.3"
     },
     "scripts": {
-        "run": "npx @tailwindcss/cli build -i style/main.scss -o public/style.css"
+        "run": "npx @tailwindcss/cli build -i style/main.scss -o public/style.css",
+        "serve": "cargo leptos serve --split",
+        "dev": "bun run run; bun run serve"
     }
 }
