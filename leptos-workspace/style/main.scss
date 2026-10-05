@@ -1,4 +1,0 @@
-{% if style == "default" %}body {
-    font-family: sans-serif;
-    text-align: center;
-}{%else%}@import "tailwindcss";{% endif %}

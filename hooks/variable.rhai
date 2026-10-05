@@ -16,6 +16,11 @@ if style == "unocss" {
 
 if style == "tailwind" {
     file::rename("styles/tailwind/package.json", "package.json");
+    file::rename("styles/tailwind/style", "style");
+}
+
+if style == "default" {
+    file::rename("styles/default/style", "style");
 }
 
 // Add to global variable
