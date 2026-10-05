@@ -5,8 +5,20 @@
         "tailwindcss": "^4.3.3"
     },
     "scripts": {
-        "run": "npx @tailwindcss/cli build -i style/main.scss -o public/style.css",
+        "build:tailwind": "npx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css",
+        "build:tailwind:minify": "npx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css --minify",
+
+        "build:scss": "sass style/main.scss target/scss.css",
+        "build:scss:minify": "sass style/main.scss target/scss.css --style=compressed",
+
+        "build:merge": "cat target/tailwind.css target/scss.css > public/style.css",
+        "build:merge:minify": "cat target/tailwind.css target/scss.css > public/style.css",
+
+        "build": "bun run build:tailwind && bun run build:scss && bun run build:merge",
+        "build:minify": "bun run build:tailwind:minify && bun run build:scss:minify && bun run build:merge:minify",
+
         "serve": "cargo leptos serve --split",
-        "dev": "bun run run; bun run serve"
+        "dev": "bun run build && bun run serve",
+        "minify": "bun run build:minify && bun run serve"
     }
 }
