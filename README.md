@@ -285,12 +285,6 @@ Enable structured logging with `tracing` and `tracing-subscriber` for better obs
 
 - **Default**: Uses Leptos built-in CSS bundling (`/pkg/{{project-name}}.css`)
 
-- **UnoCSS**: Atomic CSS engine with:
-    - Auto pattern scanning from `src/**/*.rs` (Project) or `app/**/*.rs` (Workspace)
-    - Output to `public/uno.css`
-    - `npm run watch` for development HMR
-    - `npm run build` for production minification
-
 ## Testing && Benchmarking
 
 ### Cucumber (BDD)

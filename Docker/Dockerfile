@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# TODO: need test and replace with `TailwindCSS`
 {% if style == "unocss" %}
 # Install Node.js and npm for UnoCSS (changes rarely)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \

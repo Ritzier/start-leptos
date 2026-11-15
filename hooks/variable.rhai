@@ -8,12 +8,6 @@ if websocket == false {
 // ===== Style =====
 let style = variable::get("style");
 
-// Move files out
-if style == "unocss" {
-    file::rename("styles/unocss/package.json", "package.json");
-    file::rename("styles/unocss/uno.config.ts", "uno.config.ts");
-}
-
 if style == "tailwind" {
     file::rename("styles/tailwind/package.json", "package.json");
     file::rename("styles/tailwind/style", "style");
