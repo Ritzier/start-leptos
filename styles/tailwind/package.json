@@ -11,11 +11,13 @@
         "build:scss": "sass style/main.scss target/scss.css",
         "build:scss:minify": "sass style/main.scss target/scss.css --style=compressed",
 
-        "build:merge": "cat target/tailwind.css target/scss.css > public/style.css",
-        "build:merge:minify": "cat target/tailwind.css target/scss.css > public/style.css",
+        "build:js": "bash -O nullglob -c 'rm -rf public/js; set -- js/*.js; if [ $# -gt 0 ]; then esbuild \"$@\" --outdir=public/js; fi'",
+        "build:js:minify": "bash -O nullglob -c 'rm -rf public/js; set -- js/*.js; if [ $# -gt 0 ]; then esbuild \"$@\" --outdir=public/js --minify; fi'",
 
-        "build": "bun run build:tailwind && bun run build:scss && bun run build:merge",
-        "build:minify": "bun run build:tailwind:minify && bun run build:scss:minify && bun run build:merge:minify",
+        "build:merge": "cat target/tailwind.css target/scss.css > public/style.css",
+
+        "build": "bun run build:tailwind && bun run build:scss && bun run build:js && bun run build:merge",
+        "build:minify": "bun run build:tailwind:minify && bun run build:scss:minify && bun run build:js:minify && bun run build:merge",
 
         "serve": "cargo leptos serve --split",
         "dev": "bun run build && bun run serve",
