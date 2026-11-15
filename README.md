@@ -24,7 +24,7 @@ cargo generate ritzier/start-leptos
 
 - **Websocket?** (default: false) - Enable real-time **Websocket** communication with `rkyv`
 - **Tracing?** (default: false) - Add structed logging with `tracing`
-- **Style?**: Choices: `default`, `unocss`, `tailwind` (default: `default`)
+- **Style?**: Choices: `default`, `tailwind` (default: `default`)
 - **Docker?** (default: false) - Include **Docker** setup with multi-stage builds
 - **Cucumber?** (default: false) - Add BDD end-to-end testing
     - **Benchmark?** (default: false) - Add performance benchmarking
@@ -77,6 +77,8 @@ services:
     environment:
       - RUST_LOG=debug  # Adjust log level
 ```
+
+[TODO]: <> "Update the Structure"
 
 ## Structure
 
@@ -284,6 +286,7 @@ Enable structured logging with `tracing` and `tracing-subscriber` for better obs
 ## Styling Options
 
 - **Default**: Uses Leptos built-in CSS bundling (`/pkg/{{project-name}}.css`)
+- **Tailwind**: Atomic CSS utility framework
 
 ## Testing && Benchmarking
 
