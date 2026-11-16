@@ -7,10 +7,10 @@ install:
 
 # TailWind CSS
 build-tailwind:
-    npx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css
+    bunx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css
 
 build-tailwind-minify:
-    npx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css --minify
+    bunx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css --minify
 
 # SCSS
 build-scss:
