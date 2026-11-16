@@ -14,7 +14,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HydrationScripts options />
                 <Link rel="shortcut icon" type_="image/ico" href="/favicon.ico" />
                 <Meta name="color-scheme" content="dark" />
-                {% if style == "default" %}<Stylesheet id="leptos" href="/pkg/{{project-name}}.css" />{%else%}<Stylesheet href="/style.css" />{% endif %}
+                <Stylesheet href="/style.css" />
                 <MetaTags />
             </head>
             <body>

@@ -12,18 +12,24 @@ build-tailwind:
 build-tailwind-minify:
     npx @tailwindcss/cli build -i style/tailwind.scss -o target/tailwind.css --minify
 
-{% endif -%}
 # SCSS
 build-scss:
-    sass style/main.scss target/scss.css
+    bunx sass style/main.scss target/scss.css
 
 build-scss-minify:
-    sass style/main.scss target/scss.css --style=compressed
+    bunx sass style/main.scss target/scss.css --style=compressed
 
-{% if style != "default" -%}
 # CSS merge
 build-merge:
     cat target/tailwind.css target/scss.css > public/style.css
+
+{% else -%}
+# SCSS
+build-scss:
+    bunx sass --no-source-map style/main.scss public/style.css
+
+build-scss-minify:
+    bunx sass --no-source-map style/main.scss public/style.css --style=compressed
 
 {% endif -%}
 # JavaScript
