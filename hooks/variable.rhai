@@ -15,6 +15,7 @@ if style == "tailwind" {
 
 if style == "default" {
     file::rename("styles/default/style", "style");
+    file::rename("styles/default/package.json", "package.json");
 }
 
 // Add to global variable
