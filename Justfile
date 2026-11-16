@@ -69,3 +69,6 @@ dev: build
 
 minify: build-minify
     cargo leptos serve --split
+
+release: build-minify
+    cargo leptos serve --split -rP
